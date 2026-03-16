@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="仕入れチェッカー">
+<meta name="theme-color" content="#0f0f0f">
+<title>仕入れチェッカー</title>
+<style>
+:root {
+  --bg: #0f0f0f;
+  --bg2: #1a1a1a;
+  --bg3: #252525;
+  --border: rgba(255,255,255,0.09);
+  --border2: rgba(255,255,255,0.18);
+  --text: #f0f0f0;
+  --text2: #888;
+  --text3: #444;
+  --green: #1db97a;
+  --green-bg: rgba(29,185,122,0.13);
+  --amber: #f0a500;
+  --amber-bg: rgba(240,165,0,0.13);
+  --red: #e05252;
+  --red-bg: rgba(224,82,82,0.13);
+  --r: 13px;
+  --rs: 9px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+html, body { background: var(--bg); color: var(--text); font-family: -apple-system, 'Hiragino Sans', sans-serif; min-height: 100%; }
+.app { max-width: 480px; margin: 0 auto; padding: 0 16px 100px; }
+
+/* header */
+.hdr { padding: 52px 0 14px; display: flex; align-items: center; justify-content: space-between; }
+.hdr-title { font-size: 20px; font-weight: 700; }
+.hdr-title span { color: var(--green); }
+.gear { width: 36px; height: 36px; border-radius: 50%; border: 0.5px solid var(--border2); background: var(--bg2); display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 16px; }
+
+/* input card */
+.icard { background: var(--bg2); border: 0.5px solid var(--border); border-radius: var(--r); padding: 14px 16px; margin-bottom: 10px; }
+.icard.active { border-color: var(--green); }
+.ilabel { font-size: 10px; font-weight: 700; color: var(--text3); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+.dot { width: 7px; height: 7px; border-radius: 50%; background: var(--green); animation: blink 1.8s ease-in-out infinite; flex-shrink: 0; }
+@keyframes blink { 0%,100%{opacity:1}50%{opacity:0.25} }
+.icard input[type=text], .icard input[type=number] {
+  width: 100%; background: transparent; border: none; outline: none;
+  font-size: 22px; font-weight: 600; color: var(--text);
+}
+.icard input::placeholder { color: var(--text3); font-size: 16px; font-weight: 400; }
+.ihint { font-size: 11px; color: var(--text3); margin-top: 6px; }
+
+/* condition pills */
+.pills { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px; }
+.pill { padding: 6px 13px; border-radius: 99px; border: 0.5px solid var(--border2); background: transparent; color: var(--text2); font-size: 12px; font-weight: 600; cursor: pointer; }
+.pill.on { background: var(--green-bg); border-color: var(--green); color: var(--green); }
+
+/* search buttons */
+.sbtn-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 7px; margin-bottom: 10px; }
+.sbtn { padding: 11px 6px; border-radius: var(--rs); border: 0.5px solid var(--border2); background: var(--bg2); color: var(--text); font-size: 13px; font-weight: 700; cursor: pointer; text-align: center; text-decoration: none; display: flex; flex-direction: column; align-items: center; gap: 3px; }
+.sbtn:active { opacity: 0.7; }
+.sbtn .sico { font-size: 18px; }
+.sbtn .slang { font-size: 10px; color: var(--text2); font-weight: 400; }
+.sbtn.primary { background: var(--green); border-color: var(--green); color: #fff; }
+.sbtn.primary .slang { color: rgba(255,255,255,0.7); }
+
+/* translate result */
+.tcard { background: var(--bg2); border: 0.5px solid var(--border); border-radius: var(--r); padding: 12px 14px; margin-bottom: 10px; display: none; }
+.tcard.show { display: block; }
+.trow { display: flex; align-items: center; gap: 10px; padding: 5px 0; }
+.tflag { font-size: 16px; flex-shrink: 0; }
+.ttext { font-size: 14px; font-weight: 600; flex: 1; color: var(--text); }
+.tcopy { font-size: 11px; color: var(--text3); background: var(--bg3); border: none; padding: 3px 8px; border-radius: 6px; cursor: pointer; }
+.tdiv { height: 0.5px; background: var(--border); margin: 2px 0; }
+
+/* price inputs */
+.pgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px; }
+.pfield { background: var(--bg2); border: 0.5px solid var(--border); border-radius: var(--rs); padding: 10px 12px; }
+.pfield label { font-size: 10px; font-weight: 700; color: var(--text3); letter-spacing: 0.05em; text-transform: uppercase; display: block; margin-bottom: 4px; }
+.pfield input { width: 100%; background: transparent; border: none; outline: none; font-size: 19px; font-weight: 700; color: var(--text); }
+.pfield input::placeholder { color: var(--text3); font-size: 14px; font-weight: 400; }
+.pfield .conv { font-size: 11px; color: var(--green); margin-top: 3px; }
+
+/* result */
+.rcard { border-radius: var(--r); padding: 14px 16px; margin-bottom: 10px; border: 0.5px solid var(--border); display: none; }
+.rcard.show { display: block; }
+.rcard.buy { background: var(--green-bg); border-color: var(--green); }
+.rcard.check { background: var(--amber-bg); border-color: var(--amber); }
+.rcard.pass { background: var(--red-bg); border-color: var(--red); }
+.rtop { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+.rico { font-size: 28px; }
+.rtitle { font-size: 17px; font-weight: 700; }
+.rsub { font-size: 12px; color: var(--text2); margin-top: 2px; }
+.mrow { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; }
+.mcell { background: rgba(0,0,0,0.25); border-radius: 8px; padding: 8px 6px; text-align: center; }
+.mlabel { font-size: 10px; color: var(--text2); margin-bottom: 3px; }
+.mval { font-size: 15px; font-weight: 700; }
+.mval.good { color: var(--green); }
+.mval.bad { color: var(--red); }
+.mval.warn { color: var(--amber); }
+.mval.none { color: var(--text3); }
+
+/* reset */
+.rbtn { width: 100%; padding: 13px; background: transparent; border: 0.5px solid var(--border2); color: var(--text2); font-size: 14px; font-weight: 600; border-radius: var(--rs); cursor: pointer; margin-bottom: 10px; }
+.rbtn:active { background: var(--bg3); }
+
+/* overlay */
+.ov { position: fixed; inset: 0; background: rgba(0,0,0,0.75); z-index: 100; display: none; align-items: flex-end; }
+.ov.open { display: flex; }
+.sheet { background: var(--bg2); border-radius: 20px 20px 0 0; padding: 20px; width: 100%; max-height: 85vh; overflow-y: auto; }
+.shead { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+.stitle { font-size: 16px; font-weight: 700; }
+.sclose { font-size: 13px; color: var(--text2); cursor: pointer; }
+.ssec { font-size: 10px; font-weight: 700; color: var(--text3); letter-spacing: 0.08em; text-transform: uppercase; margin: 14px 0 8px; }
+.sgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 4px; }
+.sf label { font-size: 11px; color: var(--text2); display: block; margin-bottom: 3px; }
+.sf input { width: 100%; background: var(--bg3); border: 0.5px solid var(--border2); border-radius: var(--rs); padding: 8px 10px; color: var(--text); font-size: 14px; outline: none; }
+.akey input { width: 100%; background: var(--bg3); border: 0.5px solid var(--border2); border-radius: var(--rs); padding: 8px 10px; color: var(--text); font-size: 13px; outline: none; font-family: monospace; margin-bottom: 6px; }
+.anote { font-size: 11px; color: var(--text3); line-height: 1.6; }
+.anote a { color: #4a9eff; }
+.savebtn { width: 100%; padding: 13px; background: var(--green); border: none; color: #fff; font-size: 15px; font-weight: 700; border-radius: var(--rs); cursor: pointer; margin-top: 16px; }
+
+/* dict */
+.drow { display: grid; grid-template-columns: 1fr 1fr 1fr 32px; gap: 5px; margin-bottom: 5px; }
+.drow input { background: var(--bg3); border: 0.5px solid var(--border); border-radius: 6px; padding: 6px 8px; color: var(--text); font-size: 12px; outline: none; width: 100%; }
+.ddel { width: 32px; height: 32px; background: var(--red-bg); border: none; color: var(--red); border-radius: 6px; cursor: pointer; font-size: 14px; }
+.addbtn { width: 100%; padding: 9px; background: transparent; border: 0.5px dashed var(--border2); color: var(--text3); font-size: 13px; border-radius: var(--rs); cursor: pointer; margin-top: 4px; }
+.cx-tab { flex:1; padding: 10px; text-align:center; font-size:14px; font-weight:700; border-radius:var(--rs); border:0.5px solid var(--border2); color:var(--text2); cursor:pointer; }
+.cx-tab.active { background:var(--green-bg); border-color:var(--green); color:var(--green); }
+
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="hdr">
+    <div class="hdr-title">仕入れ<span>チェッカー</span></div>
+    <div class="gear" onclick="openSettings()">⚙</div>
+  </div>
+
+  <!-- レート表示 -->
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+    <div id="rate-status" style="font-size:11px;color:var(--text3);">為替レート読込中...</div>
+    <div onclick="fetchRates()" style="font-size:11px;color:var(--text2);cursor:pointer;padding:4px 8px;border:0.5px solid var(--border2);border-radius:6px;">更新</div>
+  </div>
+
+  <!-- 入力 -->
+  <div class="icard" id="icard">
+    <div class="ilabel"><span class="dot"></span>商品名 or バーコードをスキャン</div>
+    <input type="text" id="main-input" placeholder="例：ワンピース ナミ フィギュア" autocomplete="off">
+    <div class="ihint">日本語OK・JANコードOK・スキャンOK</div>
+  </div>
+
+  <!-- 状態ボタン -->
+  <div class="pills" id="pills">
+    <div class="pill on" data-v="中古">中古</div>
+    <div class="pill" data-v="未開封">未開封</div>
+    <div class="pill" data-v="限定">限定</div>
+    <div class="pill" data-v="箱なし">箱なし</div>
+    <div class="pill" data-v="新品">新品</div>
+  </div>
+
+  <!-- 検索ボタン -->
+  <div class="sbtn-row">
+    <div class="sbtn primary" id="btn-ebay" onclick="openSite('ebay')">
+      <span class="sico">🛒</span>eBay<span class="slang">落札済み</span>
+    </div>
+    <div class="sbtn" id="btn-shopee" onclick="openSite('shopee')">
+      <span class="sico">🛍</span>Shopee<span class="slang">台湾</span>
+    </div>
+    <div class="sbtn" id="btn-mercari" onclick="openSite('mercari')">
+      <span class="sico">⭕</span>メルカリ<span class="slang">売り切れ</span>
+    </div>
+  </div>
+
+  <!-- 翻訳結果 -->
+  <div class="tcard" id="tcard">
+    <div class="trow">
+      <span class="tflag">🇺🇸</span>
+      <span class="ttext" id="t-en">—</span>
+      <button class="tcopy" onclick="cp('t-en')">コピー</button>
+    </div>
+    <div class="tdiv"></div>
+    <div class="trow">
+      <span class="tflag">🇹🇼</span>
+      <span class="ttext" id="t-tw">—</span>
+      <button class="tcopy" onclick="cp('t-tw')">コピー</button>
+    </div>
+  </div>
+
+  <!-- 価格入力 -->
+  <div class="pgrid">
+    <div class="pfield">
+      <label>仕入れ価格 (円)</label>
+      <input type="number" id="p-buy" placeholder="550" inputmode="numeric">
+    </div>
+    <div class="pfield">
+      <label>メルカリ相場 (円)</label>
+      <input type="number" id="p-mrc" placeholder="3500" inputmode="numeric">
+    </div>
+    <div class="pfield">
+      <label>eBay価格 (USD)</label>
+      <input type="number" id="p-ebay" placeholder="25" step="0.5" inputmode="decimal">
+      <div class="conv" id="conv-ebay"></div>
+    </div>
+    <div class="pfield">
+      <label>Shopee台湾 (TWD)</label>
+      <input type="number" id="p-shopee" placeholder="350" inputmode="numeric">
+      <div class="conv" id="conv-shopee"></div>
+    </div>
+  </div>
+
+  <!-- 利益結果 -->
+  <div class="rcard" id="rcard">
+    <div class="rtop">
+      <div class="rico" id="r-ico"></div>
+      <div>
+        <div class="rtitle" id="r-title"></div>
+        <div class="rsub" id="r-sub"></div>
+      </div>
+    </div>
+    <div class="mrow">
+      <div class="mcell"><div class="mlabel">メルカリ</div><div class="mval" id="rv-mrc">—</div></div>
+      <div class="mcell"><div class="mlabel">eBay</div><div class="mval" id="rv-ebay">—</div></div>
+      <div class="mcell"><div class="mlabel">Shopee</div><div class="mval" id="rv-shopee">—</div></div>
+    </div>
+  </div>
+
+  <!-- 通貨換算 -->
+  <div class="icard" id="conv-card" style="margin-bottom:10px;">
+    <div class="ilabel" onclick="toggleConvCard()" style="cursor:pointer;justify-content:space-between;">
+      <span style="display:flex;align-items:center;gap:6px;"><span class="dot"></span>通貨換算</span>
+      <span id="conv-toggle" style="font-size:11px;color:var(--text3);">▾ 開く</span>
+    </div>
+    <div id="conv-body" style="display:none;margin-top:12px;">
+      <div class="pfield" style="margin-bottom:10px;">
+        <label>日本円</label>
+        <input type="number" id="cx-jpy" placeholder="3000" inputmode="numeric" oninput="convCalc()">
+      </div>
+      <div style="display:flex;gap:8px;margin-bottom:10px;">
+        <div class="cx-tab active" id="cx-tab-usd" onclick="convSwitch('usd')">USD</div>
+        <div class="cx-tab" id="cx-tab-twd" onclick="convSwitch('twd')">TWD</div>
+      </div>
+      <div class="pfield" style="margin-bottom:6px;">
+        <label id="cx-foreign-label">USD</label>
+        <input type="number" id="cx-foreign" placeholder="20" step="0.01" inputmode="decimal" oninput="convCalcReverse()">
+      </div>
+      <div id="cx-rate-hint" style="font-size:11px;color:var(--text3);text-align:right;"></div>
+    </div>
+  </div>
+
+  <button class="rbtn" onclick="resetAll()">リセット（次の商品へ）</button>
+</div>
+
+<!-- 設定 -->
+<div class="ov" id="ov" onclick="if(event.target===this)saveSettings()">
+  <div class="sheet">
+    <div class="shead">
+      <div class="stitle">設定</div>
+      <div class="sclose" onclick="saveSettings()">保存して閉じる</div>
+    </div>
+
+    <div class="ssec">Anthropic APIキー（翻訳精度UP）</div>
+    <div class="akey">
+      <input type="password" id="s-apikey" placeholder="sk-ant-...">
+    </div>
+    <div class="anote">なくても辞書翻訳で動きます。取得: <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a></div>
+
+    <div class="ssec">為替・手数料</div>
+    <div class="sgrid">
+      <div class="sf"><label>USD→円</label><input type="number" id="s-usd" value="150"></div>
+      <div class="sf"><label>TWD→円</label><input type="number" id="s-twd" value="4.7"></div>
+      <div class="sf"><label>eBay手数料(%)</label><input type="number" id="s-ebay-fee" value="13"></div>
+      <div class="sf"><label>国際送料(円)</label><input type="number" id="s-intl" value="2500"></div>
+      <div class="sf"><label>メルカリ手数料(%)</label><input type="number" id="s-mrc-fee" value="10"></div>
+      <div class="sf"><label>メルカリ送料(円)</label><input type="number" id="s-mrc-ship" value="870"></div>
+      <div class="sf"><label>Shopee手数料(%)</label><input type="number" id="s-shopee-fee" value="12"></div>
+      <div class="sf"><label>目標利益(円)</label><input type="number" id="s-target" value="1000"></div>
+    </div>
+
+    <div class="ssec">翻訳辞書</div>
+    <div id="dict-list"></div>
+    <button class="addbtn" onclick="addDict()">＋ 追加</button>
+
+    <button class="savebtn" onclick="saveSettings()">保存する</button>
+  </div>
+</div>
+
+<script>
+const DEFAULT_DICT = [
+  {ja:'フィギュア',en:'figure',tw:'公仔'},
+  {ja:'未開封',en:'sealed',tw:'未開封'},
+  {ja:'限定',en:'limited edition',tw:'限定版'},
+  {ja:'中古',en:'used',tw:'二手'},
+  {ja:'新品',en:'new',tw:'全新'},
+  {ja:'箱なし',en:'no box',tw:'無盒'},
+  {ja:'ワンピース',en:'One Piece',tw:'航海王'},
+  {ja:'ドラゴンボール',en:'Dragon Ball',tw:'七龍珠'},
+  {ja:'ナルト',en:'Naruto',tw:'火影忍者'},
+  {ja:'鬼滅の刃',en:'Demon Slayer',tw:'鬼滅之刃'},
+  {ja:'進撃の巨人',en:'Attack on Titan',tw:'進擊的巨人'},
+  {ja:'ポケモン',en:'Pokemon',tw:'寶可夢'},
+  {ja:'ガンダム',en:'Gundam',tw:'鋼彈'},
+  {ja:'エヴァンゲリオン',en:'Evangelion',tw:'福音戰士'},
+  {ja:'レトロゲーム',en:'retro game',tw:'復古遊戲'},
+  {ja:'ファミコン',en:'Famicom NES',tw:'紅白機'},
+  {ja:'スーパーファミコン',en:'Super Famicom SNES',tw:'超任'},
+  {ja:'ゲームボーイ',en:'Game Boy',tw:'遊戲Boy'},
+  {ja:'カメラ',en:'camera',tw:'相機'},
+  {ja:'レンズ',en:'lens',tw:'鏡頭'},
+];
+
+let dict = [], conds = new Set(['中古']);
+
+function gs(id, def) { return parseFloat(document.getElementById(id)?.value) || def; }
+function gv(id) { return parseFloat(document.getElementById(id).value) || 0; }
+
+function loadSettings() {
+  try {
+    const s = JSON.parse(localStorage.getItem('sc_settings') || '{}');
+    if (s.apikey) document.getElementById('s-apikey').value = s.apikey;
+    ['usd','twd','ebay-fee','intl','mrc-fee','mrc-ship','shopee-fee','target'].forEach(k => {
+      if (s[k]) document.getElementById('s-' + k).value = s[k];
+    });
+  } catch(e) {}
+  try { dict = JSON.parse(localStorage.getItem('sc_dict')) || DEFAULT_DICT; } catch(e) { dict = [...DEFAULT_DICT]; }
+}
+
+function saveSettings() {
+  const s = {
+    apikey: document.getElementById('s-apikey').value.trim(),
+    usd: document.getElementById('s-usd').value,
+    twd: document.getElementById('s-twd').value,
+    'ebay-fee': document.getElementById('s-ebay-fee').value,
+    intl: document.getElementById('s-intl').value,
+    'mrc-fee': document.getElementById('s-mrc-fee').value,
+    'mrc-ship': document.getElementById('s-mrc-ship').value,
+    'shopee-fee': document.getElementById('s-shopee-fee').value,
+    target: document.getElementById('s-target').value,
+  };
+  localStorage.setItem('sc_settings', JSON.stringify(s));
+  saveDictFromUI();
+  document.getElementById('ov').classList.remove('open');
+  updateConv();
+}
+
+function openSettings() { renderDict(); document.getElementById('ov').classList.add('open'); }
+
+function saveDictFromUI() {
+  dict = [];
+  document.querySelectorAll('.drow-data').forEach(r => {
+    const ins = r.querySelectorAll('input');
+    if (ins[0].value.trim()) dict.push({ja:ins[0].value.trim(),en:ins[1].value.trim(),tw:ins[2].value.trim()});
+  });
+  localStorage.setItem('sc_dict', JSON.stringify(dict));
+}
+
+function renderDict() {
+  const el = document.getElementById('dict-list');
+  el.innerHTML = '';
+  dict.forEach((d, i) => {
+    const row = document.createElement('div');
+    row.className = 'drow drow-data';
+    row.innerHTML = `<input value="${d.ja}" placeholder="日本語"><input value="${d.en}" placeholder="English"><input value="${d.tw}" placeholder="繁體字"><button class="ddel" onclick="delDict(${i})">✕</button>`;
+    el.appendChild(row);
+  });
+}
+
+function addDict() { saveDictFromUI(); dict.push({ja:'',en:'',tw:''}); renderDict(); document.querySelectorAll('.drow-data input')[dict.length * 4 - 4]?.focus(); }
+function delDict(i) { saveDictFromUI(); dict.splice(i,1); renderDict(); }
+
+// ===== pills =====
+document.getElementById('pills').addEventListener('click', e => {
+  const pill = e.target.closest('.pill');
+  if (!pill) return;
+  const v = pill.dataset.v;
+  if (conds.has(v)) conds.delete(v); else conds.add(v);
+  document.querySelectorAll('.pill').forEach(p => p.className = 'pill' + (conds.has(p.dataset.v) ? ' on' : ''));
+  updateLinks();
+});
+
+// ===== input =====
+const mainInput = document.getElementById('main-input');
+mainInput.addEventListener('input', () => { updateLinks(); });
+mainInput.addEventListener('keydown', e => {
+  if (e.key === 'Enter') { e.preventDefault(); doTranslateAndOpen(); }
+});
+mainInput.addEventListener('focus', () => document.getElementById('icard').classList.add('active'));
+mainInput.addEventListener('blur', () => document.getElementById('icard').classList.remove('active'));
+
+function isJAN(s) { return /^\d{8,14}$/.test(s.trim()); }
+
+function dictTranslate(text) {
+  let en = text, tw = text;
+  dict.forEach(d => {
+    if (d.ja) { en = en.replace(new RegExp(d.ja,'g'), d.en||d.ja); tw = tw.replace(new RegExp(d.ja,'g'), d.tw||d.ja); }
+  });
+  conds.forEach(c => {
+    const f = dict.find(d => d.ja === c);
+    if (f) { if (!en.includes(f.en)) en += ' ' + f.en; if (!tw.includes(f.tw)) tw += ' ' + f.tw; }
+  });
+  return { en: en.trim(), tw: tw.trim() };
+}
+
+async function apiTranslate(text) {
+  const s = JSON.parse(localStorage.getItem('sc_settings') || '{}');
+  if (!s.apikey) return null;
+  const condStr = Array.from(conds).join('、');
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json','x-api-key':s.apikey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      body: JSON.stringify({model:'claude-haiku-4-5-20251001',max_tokens:200,messages:[{role:'user',content:`商品名「${text}」をeBay・Shopee台湾の検索用に英語と繁体字中国語に翻訳。状態：${condStr}。JSONのみ返答：{"en":"...","tw":"..."}`}]})
+    });
+    const d = await res.json();
+    return JSON.parse(d.content[0].text.replace(/```json|```/g,'').trim());
+  } catch(e) { return null; }
+}
+
+let siteUrls = { ebay: '', shopee: '', mercari: '' };
+
+function openSite(site) {
+  const q = mainInput.value.trim();
+  if (!q) return;
+  const jan = isJAN(q);
+  const res = dictTranslate(q);
+  const enQ = encodeURIComponent(jan ? q : res.en);
+  const twQ = encodeURIComponent(jan ? q : res.tw);
+  const jaQ = encodeURIComponent(q);
+  siteUrls.ebay = `https://www.ebay.com/sch/i.html?_nkw=${enQ}&LH_Sold=1&LH_Complete=1`;
+  siteUrls.shopee = `https://shopee.tw/search?keyword=${twQ}`;
+  siteUrls.mercari = `https://www.mercari.com/jp/search/?keyword=${jaQ}&status=sold_out`;
+  if (siteUrls[site]) window.location.href = siteUrls[site];
+}
+
+function updateLinks() {
+  const q = mainInput.value.trim();
+  if (!q) return;
+  const jan = isJAN(q);
+  const res = dictTranslate(q);
+  const enQ = encodeURIComponent(jan ? q : res.en);
+  const twQ = encodeURIComponent(jan ? q : res.tw);
+  const jaQ = encodeURIComponent(q);
+  siteUrls.ebay = `https://www.ebay.com/sch/i.html?_nkw=${enQ}&LH_Sold=1&LH_Complete=1`;
+  siteUrls.shopee = `https://shopee.tw/search?keyword=${twQ}`;
+  siteUrls.mercari = `https://www.mercari.com/jp/search/?keyword=${jaQ}&status=sold_out`;
+}
+
+async function doTranslateAndOpen() {
+  const q = mainInput.value.trim();
+  if (!q) return;
+  if (isJAN(q)) { updateLinks(); return; }
+  let res = await apiTranslate(q);
+  if (!res) res = dictTranslate(q);
+  document.getElementById('t-en').textContent = res.en;
+  document.getElementById('t-tw').textContent = res.tw;
+  document.getElementById('tcard').className = 'tcard show';
+  const enQ = encodeURIComponent(res.en);
+  const twQ = encodeURIComponent(res.tw);
+  const jaQ = encodeURIComponent(q);
+  siteUrls.ebay = `https://www.ebay.com/sch/i.html?_nkw=${enQ}&LH_Sold=1&LH_Complete=1`;
+  siteUrls.shopee = `https://shopee.tw/search?keyword=${twQ}`;
+  siteUrls.mercari = `https://www.mercari.com/jp/search/?keyword=${jaQ}&status=sold_out`;
+}
+
+// ===== 為替レートをlocalStorageから取得 =====
+function getRate(key, def) {
+  try {
+    const s = JSON.parse(localStorage.getItem("sc_settings") || "{}");
+    return parseFloat(s[key]) || def;
+  } catch(e) { return def; }
+}
+
+// ===== 為替表示（常時レート表示＋入力時円換算） =====
+function updateConv() {
+  const usd = getRate("usd", 150);
+  const twd = getRate("twd", 4.7);
+  const eu = gv("p-ebay"), su = gv("p-shopee");
+  const ebayEl = document.getElementById("conv-ebay");
+  const shopeeEl = document.getElementById("conv-shopee");
+  const usdFloor = Math.floor(usd);
+  const twdFloor = parseFloat(twd).toFixed(1);
+  ebayEl.textContent = eu ? eu + " USD × " + usdFloor + " = " + Math.floor(eu * usdFloor).toLocaleString() + "円" : "1 USD = " + usdFloor + "円（切捨）";
+  shopeeEl.textContent = su ? su + " TWD × " + twdFloor + " = " + Math.floor(su * twdFloor).toLocaleString() + "円" : "1 TWD = " + twdFloor + "円（切捨）";
+}
+
+// ===== 利益計算 =====
+['p-buy','p-mrc','p-ebay','p-shopee'].forEach(id => {
+  document.getElementById(id).addEventListener('input', () => { updateConv(); calcProfit(); });
+});
+
+function calcProfit() {
+  const buy = gv('p-buy');
+  const mrcPrice = gv('p-mrc');
+  const ebayUsd = gv('p-ebay');
+  const shopeePrice = gv('p-shopee');
+  if (!buy) return;
+  if (!mrcPrice && !ebayUsd && !shopeePrice) return;
+
+  const usd = getRate("usd", 150);
+  const twd = getRate("twd", 4.7);
+  const ebayFee = getRate("ebay-fee", 13) / 100;
+  const intl = getRate("intl", 2500);
+  const mrcFee = getRate("mrc-fee", 10) / 100;
+  const mrcShip = getRate("mrc-ship", 870);
+  const shopeeFee = getRate("shopee-fee", 12) / 100;
+  const target = getRate("target", 1000);
+
+  let mrcP = null, ebayP = null, shopeeP = null;
+  if (mrcPrice) mrcP = Math.round(mrcPrice * (1 - mrcFee) - mrcShip - buy);
+  const usdF = Math.floor(usd);
+  const twdF = parseFloat(twd.toFixed ? twd : twd);
+  if (ebayUsd) ebayP = Math.floor(ebayUsd * usdF * (1 - ebayFee) - intl - buy);
+  if (shopeePrice) shopeeP = Math.floor(shopeePrice * twdF * (1 - shopeeFee) - intl - buy);
+
+  function fmt(v) { return v === null ? '—' : (v >= 0 ? '+' : '') + v.toLocaleString() + '円'; }
+  function cls(v) { return v === null ? 'none' : v >= target ? 'good' : v < 0 ? 'bad' : 'warn'; }
+
+  ['mrc','ebay','shopee'].forEach((k, i) => {
+    const val = [mrcP, ebayP, shopeeP][i];
+    const el = document.getElementById('rv-' + k);
+    el.textContent = fmt(val);
+    el.className = 'mval ' + cls(val);
+  });
+
+  const profits = [mrcP, ebayP, shopeeP].filter(p => p !== null);
+  const best = Math.max(...profits);
+  const routes = [];
+  if (mrcP === best) routes.push('メルカリ');
+  if (ebayP === best) routes.push('eBay');
+  if (shopeeP === best) routes.push('Shopee');
+
+  const rc = document.getElementById('rcard');
+  rc.className = 'rcard show ' + (best >= target ? 'buy' : best >= 0 ? 'check' : 'pass');
+  document.getElementById('r-ico').textContent = best >= target ? '✓' : best >= 0 ? '△' : '✕';
+  document.getElementById('r-title').textContent = best >= target ? routes.join(' / ') + ' で仕入れOK' : best >= 0 ? 'ギリギリ黒字、要検討' : 'この仕入れはNG';
+  document.getElementById('r-sub').textContent = `最大利益 ${best.toLocaleString()}円 ／ 仕入れ ${buy.toLocaleString()}円`;
+}
+
+function cp(id) { navigator.clipboard.writeText(document.getElementById(id).textContent).catch(()=>{}); }
+
+// ===== 通貨換算 =====
+let convMode = 'usd';
+
+function toggleConvCard() {
+  const body = document.getElementById('conv-body');
+  const tog = document.getElementById('conv-toggle');
+  const open = body.style.display === 'none';
+  body.style.display = open ? 'block' : 'none';
+  tog.textContent = open ? '▴ 閉じる' : '▾ 開く';
+  if (open) convUpdateHint();
+}
+
+function convSwitch(mode) {
+  convMode = mode;
+  document.getElementById('cx-tab-usd').className = 'cx-tab' + (mode==='usd'?' active':'');
+  document.getElementById('cx-tab-twd').className = 'cx-tab' + (mode==='twd'?' active':'');
+  document.getElementById('cx-foreign-label').textContent = mode.toUpperCase();
+  document.getElementById('cx-foreign').placeholder = mode==='usd' ? '20' : '330';
+  document.getElementById('cx-foreign').value = '';
+  document.getElementById('cx-jpy').value = '';
+  convUpdateHint();
+}
+
+function convUpdateHint() {
+  const rate = convMode==='usd' ? getRate('usd',155) : getRate('twd',4.5);
+  document.getElementById('cx-rate-hint').textContent = '1 ' + convMode.toUpperCase() + ' = ' + rate + '円（切捨レート）';
+}
+
+function convCalc() {
+  const rate = convMode==='usd' ? getRate('usd',155) : getRate('twd',4.5);
+  const jpy = parseFloat(document.getElementById('cx-jpy').value);
+  const dec = convMode==='usd' ? 2 : 1;
+  document.getElementById('cx-foreign').value = jpy ? (jpy/rate).toFixed(dec) : '';
+}
+
+function convCalcReverse() {
+  const rate = convMode==='usd' ? getRate('usd',155) : getRate('twd',4.5);
+  const foreign = parseFloat(document.getElementById('cx-foreign').value);
+  document.getElementById('cx-jpy').value = foreign ? Math.floor(foreign*rate) : '';
+}
+
+function resetAll() {
+  mainInput.value = '';
+  ['p-buy','p-mrc','p-ebay','p-shopee'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('tcard').className = 'tcard';
+  document.getElementById('rcard').className = 'rcard';
+  document.getElementById('conv-ebay').textContent = '';
+  document.getElementById('conv-shopee').textContent = '';
+  ['rv-mrc','rv-ebay','rv-shopee'].forEach(id => { const e = document.getElementById(id); e.textContent = '—'; e.className = 'mval none'; });
+  ['btn-ebay','btn-shopee','btn-mercari'].forEach(id => document.getElementById(id).href = '#');
+  mainInput.focus();
+}
+
+// ===== 固定レート（5円単位切り捨て） =====
+// USD 159円 → 155円、TWD 4.98円 → 4.5円
+const FIXED_USD = 155;
+const FIXED_TWD = 4.5;
+
+function initRates() {
+  const s = JSON.parse(localStorage.getItem('sc_settings') || '{}');
+  // 設定に値がなければ固定値をセット
+  if (!s.usd) s.usd = FIXED_USD;
+  if (!s.twd) s.twd = FIXED_TWD;
+  localStorage.setItem('sc_settings', JSON.stringify(s));
+  document.getElementById('s-usd').value = s.usd;
+  document.getElementById('s-twd').value = s.twd;
+  const rateEl = document.getElementById('rate-status');
+  rateEl.textContent = 'USD ' + s.usd + '円 / TWD ' + s.twd + '円（5円単位切捨・保守的レート）';
+  rateEl.style.color = 'var(--text2)';
+  updateConv();
+}
+
+loadSettings();
+initRates();
+mainInput.focus();
+</script>
+</body>
+</html>
