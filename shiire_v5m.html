@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="仕入れリサーチ">
+<meta name="theme-color" content="#0f0f0f">
+<title>仕入れリサーチ</title>
+<style>
+:root{--bg:#0f0f0f;--bg2:#1a1a1a;--bg3:#252525;--border:rgba(255,255,255,0.09);--border2:rgba(255,255,255,0.18);--text:#f0f0f0;--text2:#888;--text3:#444;--green:#1db97a;--green-bg:rgba(29,185,122,0.13);--amber:#f0a500;--red:#e05252;--r:13px;--rs:9px;}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+html,body{background:var(--bg);color:var(--text);font-family:-apple-system,'Hiragino Sans',sans-serif;min-height:100%;}
+.app{max-width:480px;margin:0 auto;padding:0 16px 80px;}
+.hdr{padding:48px 0 10px;display:flex;align-items:center;justify-content:space-between;}
+.hdr-title{font-size:20px;font-weight:700;}
+.hdr-title span{color:var(--green);}
+.hdr-right{display:flex;gap:8px;}
+.icon-btn{width:36px;height:36px;border-radius:50%;border:0.5px solid var(--border2);background:var(--bg2);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;}
+.rate-bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+.rate-txt{font-size:11px;color:var(--text2);}
+.rate-txt.ok{color:var(--green);}
+.rate-txt.err{color:var(--amber);}
+.rate-refresh{font-size:11px;color:var(--text3);cursor:pointer;padding:3px 8px;border:0.5px solid var(--border2);border-radius:6px;}
+.icard{background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--r);padding:14px 16px;margin-bottom:10px;transition:border-color 0.2s;}
+.icard.focus{border-color:var(--green);}
+.ilabel{font-size:10px;font-weight:700;color:var(--text3);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:8px;display:flex;align-items:center;gap:6px;}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--green);animation:blink 1.8s ease-in-out infinite;flex-shrink:0;}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0.25}}
+.icard input{width:100%;background:transparent;border:none;outline:none;font-size:22px;font-weight:600;color:var(--text);}
+.icard input::placeholder{color:var(--text3);font-size:16px;font-weight:400;}
+.ihint{font-size:11px;color:var(--text3);margin-top:6px;}
+.pills{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;}
+.pill{padding:6px 13px;border-radius:99px;border:0.5px solid var(--border2);background:transparent;color:var(--text2);font-size:12px;font-weight:600;cursor:pointer;}
+.pill.on{background:var(--green-bg);border-color:var(--green);color:var(--green);}
+.sbtn-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;margin-bottom:10px;}
+.sbtn{padding:12px 6px;border-radius:var(--rs);border:0.5px solid var(--border2);background:var(--bg2);color:var(--text);font-size:13px;font-weight:700;cursor:pointer;text-align:center;display:flex;flex-direction:column;align-items:center;gap:3px;}
+.sbtn:active{opacity:0.7;}
+.sbtn .sico{font-size:18px;}
+.sbtn .slang{font-size:10px;color:var(--text2);font-weight:400;}
+
+.sec-label{font-size:10px;font-weight:700;color:var(--text3);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:8px;}
+.conv-card{background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--r);padding:14px 16px;margin-bottom:10px;}
+.conv-tabs{display:flex;gap:8px;margin-bottom:12px;}
+.ctab{flex:1;padding:10px;text-align:center;font-size:14px;font-weight:700;border-radius:var(--rs);border:0.5px solid var(--border2);color:var(--text2);cursor:pointer;}
+.ctab.on{background:var(--green-bg);border-color:var(--green);color:var(--green);}
+.conv-row{display:grid;grid-template-columns:1fr 36px 1fr;align-items:center;gap:8px;margin-bottom:6px;}
+.cfield{background:var(--bg3);border:0.5px solid var(--border);border-radius:var(--rs);padding:10px 12px;}
+.cfield label{font-size:10px;font-weight:700;color:var(--text3);letter-spacing:0.05em;text-transform:uppercase;display:block;margin-bottom:4px;}
+.cfield input{width:100%;background:transparent;border:none;outline:none;font-size:19px;font-weight:700;color:var(--text);}
+.cfield input::placeholder{color:var(--text3);font-size:14px;font-weight:400;}
+.conv-arrow{text-align:center;color:var(--text3);font-size:18px;}
+.conv-rate{font-size:11px;color:var(--text3);text-align:right;margin-top:4px;}
+.calc-modal{position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:200;display:none;align-items:flex-end;}
+.calc-modal.open{display:flex;}
+.calc-sheet{background:var(--bg2);border-radius:20px 20px 0 0;padding:16px;width:100%;}
+.calc-display{background:var(--bg3);border-radius:var(--rs);padding:12px 16px;margin-bottom:12px;text-align:right;}
+.calc-expr{font-size:11px;color:var(--text3);min-height:16px;}
+.calc-val{font-size:32px;font-weight:700;color:var(--text);}
+.calc-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;}
+.cbtn{padding:16px 8px;background:var(--bg3);border:0.5px solid var(--border);border-radius:var(--rs);color:var(--text);font-size:20px;font-weight:600;cursor:pointer;text-align:center;}
+.cbtn:active{opacity:0.6;transform:scale(0.96);}
+.cbtn.op{background:var(--bg);color:var(--text2);}
+.cbtn.accent{background:var(--green-bg);color:var(--green);border-color:var(--green);}
+.cbtn.wide{grid-column:span 2;}
+.calc-close{width:100%;padding:12px;background:transparent;border:0.5px solid var(--border2);color:var(--text2);font-size:14px;font-weight:600;border-radius:var(--rs);cursor:pointer;margin-top:8px;}
+.rbtn{width:100%;padding:13px;background:transparent;border:0.5px solid var(--border2);color:var(--text2);font-size:14px;font-weight:600;border-radius:var(--rs);cursor:pointer;}
+.rbtn:active{background:var(--bg3);}
+.ov{position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:100;display:none;align-items:flex-end;}
+.ov.open{display:flex;}
+.sheet{background:var(--bg2);border-radius:20px 20px 0 0;padding:20px;width:100%;max-height:85vh;overflow-y:auto;}
+.shead{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;}
+.stitle{font-size:16px;font-weight:700;}
+.sclose{font-size:13px;color:var(--text2);cursor:pointer;}
+.ssec{font-size:10px;font-weight:700;color:var(--text3);letter-spacing:0.08em;text-transform:uppercase;margin:14px 0 8px;}
+.sgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:4px;}
+.sf label{font-size:11px;color:var(--text2);display:block;margin-bottom:3px;}
+.sf input{width:100%;background:var(--bg3);border:0.5px solid var(--border2);border-radius:var(--rs);padding:8px 10px;color:var(--text);font-size:14px;outline:none;}
+.akey input{width:100%;background:var(--bg3);border:0.5px solid var(--border2);border-radius:var(--rs);padding:8px 10px;color:var(--text);font-size:13px;outline:none;font-family:monospace;margin-bottom:6px;}
+.anote{font-size:11px;color:var(--text3);line-height:1.6;}
+.anote a{color:#4a9eff;}
+.savebtn{width:100%;padding:13px;background:var(--green);border:none;color:#fff;font-size:15px;font-weight:700;border-radius:var(--rs);cursor:pointer;margin-top:16px;}
+.drow{display:grid;grid-template-columns:1fr 1fr 1fr 32px;gap:5px;margin-bottom:5px;}
+.drow input{background:var(--bg3);border:0.5px solid var(--border);border-radius:6px;padding:6px 8px;color:var(--text);font-size:12px;outline:none;width:100%;}
+.ddel{width:32px;height:32px;background:rgba(224,82,82,0.13);border:none;color:var(--red);border-radius:6px;cursor:pointer;font-size:14px;}
+.addbtn{width:100%;padding:9px;background:transparent;border:0.5px dashed var(--border2);color:var(--text3);font-size:13px;border-radius:var(--rs);cursor:pointer;margin-top:4px;}
+.img-modal{position:fixed;inset:0;background:rgba(0,0,0,0.9);z-index:300;display:none;flex-direction:column;align-items:center;justify-content:center;padding:20px;}
+.img-modal.open{display:flex;}
+.img-preview{max-width:100%;max-height:50vh;border-radius:var(--r);margin-bottom:16px;}
+.img-btns{display:flex;flex-direction:column;gap:8px;width:100%;}
+.img-btn{padding:14px;border-radius:var(--rs);border:none;font-size:14px;font-weight:700;cursor:pointer;text-align:center;}
+.img-btn.google{background:#4285F4;color:#fff;}
+.img-btn.cancel{background:var(--bg3);color:var(--text2);}
+.mode-btn{padding:5px 12px;border-radius:99px;font-size:12px;font-weight:600;color:var(--text2);cursor:pointer;transition:all 0.15s;}
+.mode-btn.on{background:var(--green);color:#fff;}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="hdr">
+    <div class="hdr-title">仕入れ<span>リサーチ</span></div>
+    <div class="hdr-right">
+      <div class="icon-btn" onclick="openSettings()">⚙</div>
+    </div>
+  </div>
+
+  <div class="rate-bar">
+    <div class="rate-txt" id="rate-txt">為替レート読込中...</div>
+    <div class="rate-refresh" onclick="fetchRates()">更新</div>
+  </div>
+
+  <div class="icard" id="icard">
+    <div class="ilabel"><span class="dot"></span>商品名 or バーコードをスキャン</div>
+    <input type="text" id="main-input" placeholder="例：ワンピース ナミ フィギュア" autocomplete="off">
+    <div class="ihint">日本語OK・JANコードOK・Bluetoothスキャナー対応・Enterで翻訳</div>
+    <div style="margin-top:8px;text-align:right;">
+      <span onclick="window.open('https://lens.google.com/','_blank')" style="font-size:12px;color:var(--text3);cursor:pointer;padding:4px 10px;border:0.5px solid var(--border2);border-radius:99px;background:var(--bg3);">🔍 Googleレンズで探す</span>
+    </div>
+  </div>
+
+  <div class="pills" id="pills">
+    <div class="pill on" data-v="中古">中古</div>
+    <div class="pill" data-v="未開封">未開封</div>
+    <div class="pill" data-v="限定">限定</div>
+    <div class="pill" data-v="箱なし">箱なし</div>
+    <div class="pill" data-v="新品">新品</div>
+  </div>
+
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+    <div style="font-size:11px;color:var(--text2);">検索モード</div>
+    <div style="display:flex;background:var(--bg2);border:0.5px solid var(--border2);border-radius:99px;padding:3px;gap:3px;">
+      <div id="mode-sold" class="mode-btn on" onclick="setMode('sold')">落札済み</div>
+      <div id="mode-active" class="mode-btn" onclick="setMode('active')">販売中</div>
+    </div>
+  </div>
+  <div class="sbtn-row" style="grid-template-columns:1fr 1fr;gap:7px;">
+    <div class="sbtn" onclick="openSite('ebay')"><span class="sico">🛒</span>eBay</div>
+    <div class="sbtn" onclick="openSite('shopee')"><span class="sico">🛍</span>Shopee</div>
+    <div class="sbtn" onclick="openSite('mercari')"><span class="sico">⭕</span>メルカリ</div>
+    <div class="sbtn" onclick="openSite('yahoo')"><span class="sico">🔨</span>ヤフオク</div>
+  </div>
+
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+    <div class="sec-label" style="margin-bottom:0;">通貨換算</div>
+    <div style="font-size:12px;font-weight:600;color:var(--text2);cursor:pointer;padding:5px 12px;border:0.5px solid var(--border2);border-radius:99px;background:var(--bg2);" onclick="openCalc()">🧮 計算機</div>
+  </div>
+  <div class="conv-card">
+    <div class="conv-tabs">
+      <div class="ctab on" id="ctab-usd" onclick="convSwitch('usd')">USD</div>
+      <div class="ctab" id="ctab-twd" onclick="convSwitch('twd')">TWD</div>
+    </div>
+    <div class="conv-row">
+      <div class="cfield"><label>日本円</label><input type="number" id="cx-jpy" placeholder="3000" inputmode="numeric" oninput="convFrom('jpy')"></div>
+      <div class="conv-arrow">⇄</div>
+      <div class="cfield"><label id="cx-flabel">USD</label><input type="number" id="cx-foreign" placeholder="20" step="0.01" inputmode="decimal" oninput="convFrom('foreign')"></div>
+    </div>
+    <div class="conv-rate" id="cx-rate-hint">1 USD = 155円（切捨レート）</div>
+  </div>
+
+  <button class="rbtn" onclick="resetAll()">リセット（次の商品へ）</button>
+</div>
+
+<input type="file" id="img-input" accept="image/*" capture="environment" style="display:none;" onchange="handleImageUpload(event)">
+
+<!-- 計算機 -->
+<div class="calc-modal" id="calc-modal" onclick="if(event.target===this)closeCalc()">
+  <div class="calc-sheet">
+    <div class="calc-display">
+      <div class="calc-expr" id="calc-expr"></div>
+      <div class="calc-val" id="calc-val">0</div>
+    </div>
+    <div class="calc-grid">
+      <div class="cbtn op" onclick="cOp('C')">C</div>
+      <div class="cbtn op" onclick="cOp('±')">±</div>
+      <div class="cbtn op" onclick="cOp('%')">%</div>
+      <div class="cbtn accent" onclick="cOp('÷')">÷</div>
+      <div class="cbtn" onclick="cNum('7')">7</div>
+      <div class="cbtn" onclick="cNum('8')">8</div>
+      <div class="cbtn" onclick="cNum('9')">9</div>
+      <div class="cbtn accent" onclick="cOp('×')">×</div>
+      <div class="cbtn" onclick="cNum('4')">4</div>
+      <div class="cbtn" onclick="cNum('5')">5</div>
+      <div class="cbtn" onclick="cNum('6')">6</div>
+      <div class="cbtn accent" onclick="cOp('−')">−</div>
+      <div class="cbtn" onclick="cNum('1')">1</div>
+      <div class="cbtn" onclick="cNum('2')">2</div>
+      <div class="cbtn" onclick="cNum('3')">3</div>
+      <div class="cbtn accent" onclick="cOp('+')">+</div>
+      <div class="cbtn wide" onclick="cNum('0')">0</div>
+      <div class="cbtn" onclick="cNum('.')">.</div>
+      <div class="cbtn accent" onclick="cOp('=')">=</div>
+    </div>
+    <button class="calc-close" onclick="closeCalc()">閉じる</button>
+  </div>
+</div>
+
+<!-- 設定 -->
+<div class="ov" id="ov" onclick="if(event.target===this)saveSettings()">
+  <div class="sheet">
+    <div class="shead"><div class="stitle">設定</div><div class="sclose" onclick="saveSettings()">保存して閉じる</div></div>
+    <div class="ssec">Anthropic APIキー（翻訳精度UP）</div>
+    <div class="akey"><input type="password" id="s-apikey" placeholder="sk-ant-..."></div>
+    <div class="anote">なくても辞書翻訳で動きます。取得先: <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a></div>
+    <div class="ssec">為替レート（自動取得 or 手動で上書き）</div>
+    <div class="sgrid">
+      <div class="sf"><label>USD→円</label><input type="number" id="s-usd" value="155"></div>
+      <div class="sf"><label>TWD→円</label><input type="number" id="s-twd" value="4.5"></div>
+    </div>
+    <div class="ssec">翻訳辞書（日本語→英語→繁体字）</div>
+    <div id="dict-list"></div>
+    <button class="addbtn" onclick="addDict()">＋ 追加</button>
+    <button class="savebtn" onclick="saveSettings()">保存する</button>
+  </div>
+</div>
+
+<script>
+const DEFAULT_DICT=[
+  {ja:'フィギュア',en:'figure',tw:'公仔'},{ja:'未開封',en:'sealed',tw:'未開封'},
+  {ja:'限定',en:'limited edition',tw:'限定版'},{ja:'中古',en:'used',tw:'二手'},
+  {ja:'新品',en:'new',tw:'全新'},{ja:'箱なし',en:'no box',tw:'無盒'},
+  {ja:'ワンピース',en:'One Piece',tw:'航海王'},{ja:'ドラゴンボール',en:'Dragon Ball',tw:'七龍珠'},
+  {ja:'ナルト',en:'Naruto',tw:'火影忍者'},{ja:'鬼滅の刃',en:'Demon Slayer',tw:'鬼滅之刃'},
+  {ja:'進撃の巨人',en:'Attack on Titan',tw:'進擊的巨人'},{ja:'ポケモン',en:'Pokemon',tw:'寶可夢'},
+  {ja:'ガンダム',en:'Gundam',tw:'鋼彈'},{ja:'エヴァンゲリオン',en:'Evangelion',tw:'福音戰士'},
+  {ja:'レトロゲーム',en:'retro game',tw:'復古遊戲'},{ja:'ファミコン',en:'Famicom NES',tw:'紅白機'},
+  {ja:'スーパーファミコン',en:'Super Famicom SNES',tw:'超任'},{ja:'ゲームボーイ',en:'Game Boy',tw:'遊戲Boy'},
+  {ja:'カメラ',en:'camera',tw:'相機'},{ja:'レンズ',en:'lens',tw:'鏡頭'},
+];
+
+let dict=[],conds=new Set(['中古']),convMode='usd';
+let siteUrls={ebay:'',shopee:'',mercari:'',yahoo:''};
+let searchMode='sold';
+
+function setMode(mode){
+  searchMode=mode;
+  document.getElementById('mode-sold').className='mode-btn'+(mode==='sold'?' on':'');
+  document.getElementById('mode-active').className='mode-btn'+(mode==='active'?' on':'');
+  updateLinks();
+}
+
+function getS(k,d){try{return parseFloat(JSON.parse(localStorage.getItem('sc_settings')||'{}')[k])||d;}catch(e){return d;}}
+
+function loadSettings(){
+  try{
+    const s=JSON.parse(localStorage.getItem('sc_settings')||'{}');
+    if(s.apikey)document.getElementById('s-apikey').value=s.apikey;
+    if(s.usd)document.getElementById('s-usd').value=s.usd;
+    if(s.twd)document.getElementById('s-twd').value=s.twd;
+  }catch(e){}
+  try{dict=JSON.parse(localStorage.getItem('sc_dict'))||DEFAULT_DICT;}
+  catch(e){dict=[...DEFAULT_DICT];}
+}
+
+function saveSettings(){
+  const s=JSON.parse(localStorage.getItem('sc_settings')||'{}');
+  s.apikey=document.getElementById('s-apikey').value.trim();
+  s.usd=document.getElementById('s-usd').value;
+  s.twd=document.getElementById('s-twd').value;
+  localStorage.setItem('sc_settings',JSON.stringify(s));
+  saveDictFromUI();
+  document.getElementById('ov').classList.remove('open');
+  updateConvHint();
+}
+
+function openSettings(){renderDict();document.getElementById('ov').classList.add('open');}
+function saveDictFromUI(){
+  dict=[];
+  document.querySelectorAll('.drow-data').forEach(r=>{
+    const ins=r.querySelectorAll('input');
+    if(ins[0].value.trim())dict.push({ja:ins[0].value.trim(),en:ins[1].value.trim(),tw:ins[2].value.trim()});
+  });
+  localStorage.setItem('sc_dict',JSON.stringify(dict));
+}
+function renderDict(){
+  const el=document.getElementById('dict-list');el.innerHTML='';
+  dict.forEach((d,i)=>{
+    const row=document.createElement('div');row.className='drow drow-data';
+    row.innerHTML=`<input value="${d.ja}" placeholder="日本語"><input value="${d.en}" placeholder="English"><input value="${d.tw}" placeholder="繁體字"><button class="ddel" onclick="delDict(${i})">✕</button>`;
+    el.appendChild(row);
+  });
+}
+function addDict(){saveDictFromUI();dict.push({ja:'',en:'',tw:''});renderDict();}
+function delDict(i){saveDictFromUI();dict.splice(i,1);renderDict();}
+
+async function fetchRates(){
+  const el=document.getElementById('rate-txt');
+  el.textContent='取得中...';el.className='rate-txt';
+  try{
+    const [usdRes,twdRes]=await Promise.all([
+      fetch('https://open.er-api.com/v6/latest/USD'),
+      fetch('https://open.er-api.com/v6/latest/TWD')
+    ]);
+    const usdData=await usdRes.json();
+    const twdData=await twdRes.json();
+    const usd=Math.floor(usdData.rates.JPY/5)*5;
+    const twd=Math.floor(twdData.rates.JPY*10)/10;
+    const s=JSON.parse(localStorage.getItem('sc_settings')||'{}');
+    s.usd=usd;s.twd=twd;
+    localStorage.setItem('sc_settings',JSON.stringify(s));
+    document.getElementById('s-usd').value=usd;
+    document.getElementById('s-twd').value=twd;
+    const now=new Date();
+    const hm=now.getHours()+':'+String(now.getMinutes()).padStart(2,'0');
+    el.textContent='USD '+usd+'円 / TWD '+twd+'円（'+hm+'取得・5円切捨）';
+    el.className='rate-txt ok';
+    updateConvHint();
+  }catch(e){
+    el.textContent='自動取得失敗 — 設定の値を使用中';
+    el.className='rate-txt err';
+  }
+}
+
+document.getElementById('pills').addEventListener('click',e=>{
+  const pill=e.target.closest('.pill');if(!pill)return;
+  const v=pill.dataset.v;
+  if(conds.has(v))conds.delete(v);else conds.add(v);
+  document.querySelectorAll('.pill').forEach(p=>p.className='pill'+(conds.has(p.dataset.v)?' on':''));
+  updateLinks();
+});
+
+const mainInput=document.getElementById('main-input');
+mainInput.addEventListener('focus',()=>document.getElementById('icard').classList.add('focus'));
+mainInput.addEventListener('blur',()=>document.getElementById('icard').classList.remove('focus'));
+mainInput.addEventListener('input',()=>updateLinks());
+mainInput.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();doTranslate();}});
+
+function isJAN(s){return /^\d{8,14}$/.test(s.trim());}
+
+function dictTranslate(text){
+  let en=text,tw=text;
+  dict.forEach(d=>{
+    if(d.ja){en=en.replace(new RegExp(d.ja,'g'),d.en||d.ja);tw=tw.replace(new RegExp(d.ja,'g'),d.tw||d.ja);}
+  });
+  conds.forEach(c=>{
+    const f=dict.find(d=>d.ja===c);
+    if(f){if(!en.includes(f.en))en+=' '+f.en;if(!tw.includes(f.tw))tw+=' '+f.tw;}
+  });
+  return{en:en.trim(),tw:tw.trim()};
+}
+
+async function apiTranslate(text){
+  const s=JSON.parse(localStorage.getItem('sc_settings')||'{}');
+  if(!s.apikey)return null;
+  const condStr=Array.from(conds).join('、');
+  try{
+    const res=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','x-api-key':s.apikey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      body:JSON.stringify({model:'claude-haiku-4-5-20251001',max_tokens:200,messages:[{role:'user',content:`商品名「${text}」をeBay・Shopee台湾検索用に英語と繁体字に翻訳。状態：${condStr}。JSONのみ：{"en":"...","tw":"..."}`}]})
+    });
+    const d=await res.json();
+    return JSON.parse(d.content[0].text.replace(/```json|```/g,'').trim());
+  }catch(e){return null;}
+}
+
+async function googleTranslate(text, target){
+  try{
+    const url='https://translate.googleapis.com/translate_a/single?client=gtx&sl=ja&tl='+target+'&dt=t&q='+encodeURIComponent(text);
+    const res=await fetch(url);
+    const data=await res.json();
+    return data[0].map(item=>item[0]).join('');
+  }catch(e){return null;}
+}
+
+async function doTranslate(){
+  const q=mainInput.value.trim();if(!q)return;
+  const enEl=document.getElementById('t-en');
+  const twEl=document.getElementById('t-tw');
+  const hint=document.getElementById('trans-hint');
+  if(isJAN(q)){
+    enEl.textContent=q;enEl.className='ttext';
+    twEl.textContent=q;twEl.className='ttext';
+    hint.textContent='JANコード — そのまま検索に使用';
+    updateLinks(q,q);return;
+  }
+  hint.textContent='翻訳中...';
+
+  // 状態ワードを追加
+  const condWords=Array.from(conds).join(' ');
+  const fullQ=condWords?q+' '+condWords:q;
+
+  // まずClaude APIを試す、なければGoogle翻訳、なければ辞書
+  let res=await apiTranslate(q);
+  let method='Claude APIで翻訳';
+
+  if(!res){
+    const [en,tw]=await Promise.all([
+      googleTranslate(fullQ,'en'),
+      googleTranslate(fullQ,'zh-TW')
+    ]);
+    if(en&&tw){
+      res={en,tw};
+      method='Google翻訳';
+    }
+  }
+
+  if(!res){
+    res=dictTranslate(q);
+    method='辞書翻訳';
+  }
+
+  enEl.textContent=res.en;enEl.className='ttext';
+  twEl.textContent=res.tw;twEl.className='ttext';
+  hint.textContent=method;
+  updateLinks(res.en,res.tw);
+}
+
+function updateLinks(en,tw){
+  const q=mainInput.value.trim();if(!q)return;
+  const jan=isJAN(q);
+  const enQ=encodeURIComponent(en||(jan?q:dictTranslate(q).en));
+  const twQ=encodeURIComponent(tw||(jan?q:dictTranslate(q).tw));
+  const jaQ=encodeURIComponent(q);
+  if(searchMode==='sold'){
+    siteUrls.ebay=`https://www.ebay.com/sch/i.html?_nkw=${enQ}&LH_Sold=1&LH_Complete=1`;
+    siteUrls.shopee=`https://shopee.tw/search?keyword=${twQ}`;
+    siteUrls.mercari=`https://www.mercari.com/jp/search/?keyword=${jaQ}&status=sold_out`;
+    siteUrls.yahoo=`https://auctions.yahoo.co.jp/closedsearch/closedsearch?p=${jaQ}`;
+  }else{
+    siteUrls.ebay=`https://www.ebay.com/sch/i.html?_nkw=${enQ}`;
+    siteUrls.shopee=`https://shopee.tw/search?keyword=${twQ}`;
+    siteUrls.mercari=`https://www.mercari.com/jp/search/?keyword=${jaQ}`;
+    siteUrls.yahoo=`https://auctions.yahoo.co.jp/search/search?p=${jaQ}`;
+  }
+}
+
+function openSite(site){
+  const q=mainInput.value.trim();if(!q)return;
+  updateLinks();
+  if(siteUrls[site])window.open(siteUrls[site],'_blank');
+}
+
+function cp(id){
+  const el=document.getElementById(id);
+  if(el.className.includes('empty'))return;
+  navigator.clipboard.writeText(el.textContent).catch(()=>{});
+}
+
+function getRate(){return getS(convMode==='usd'?'usd':'twd',convMode==='usd'?155:4.5);}
+
+function convSwitch(mode){
+  convMode=mode;
+  document.getElementById('ctab-usd').className='ctab'+(mode==='usd'?' on':'');
+  document.getElementById('ctab-twd').className='ctab'+(mode==='twd'?' on':'');
+  document.getElementById('cx-flabel').textContent=mode.toUpperCase();
+  document.getElementById('cx-foreign').placeholder=mode==='usd'?'20':'330';
+  document.getElementById('cx-foreign').step=mode==='usd'?'0.01':'1';
+  document.getElementById('cx-jpy').value='';
+  document.getElementById('cx-foreign').value='';
+  updateConvHint();
+}
+
+function updateConvHint(){
+  const r=getRate();
+  document.getElementById('cx-rate-hint').textContent='1 '+convMode.toUpperCase()+' = '+r+'円（切捨レート）';
+}
+
+function convFrom(from){
+  const r=getRate();
+  if(from==='jpy'){
+    const jpy=parseFloat(document.getElementById('cx-jpy').value);
+    document.getElementById('cx-foreign').value=jpy?(jpy/r).toFixed(convMode==='usd'?2:1):'';
+  }else{
+    const f=parseFloat(document.getElementById('cx-foreign').value);
+    document.getElementById('cx-jpy').value=f?Math.floor(f*r):'';
+  }
+}
+
+let cVal='0',cExpr='',cOp_='',cPrev=0,cFresh=false;
+function openCalc(){document.getElementById('calc-modal').classList.add('open');}
+function closeCalc(){document.getElementById('calc-modal').classList.remove('open');}
+function cUpdate(){
+  const num=parseFloat(cVal);
+  document.getElementById('calc-val').textContent=isNaN(num)?'0':num.toLocaleString('ja-JP',{maximumFractionDigits:8});
+  document.getElementById('calc-expr').textContent=cExpr;
+}
+function cNum(n){
+  if(cFresh){cVal='0';cFresh=false;}
+  if(n==='.'&&cVal.includes('.'))return;
+  cVal=cVal==='0'&&n!=='.'?n:cVal+n;
+  cUpdate();
+}
+function cOp(op){
+  const cur=parseFloat(cVal)||0;
+  if(op==='C'){cVal='0';cExpr='';cOp_='';cPrev=0;cFresh=false;}
+  else if(op==='±'){cVal=String(-cur);}
+  else if(op==='%'){cVal=String(cur/100);}
+  else if(op==='='){
+    if(!cOp_)return;
+    let res=0;
+    if(cOp_==='+')res=cPrev+cur;
+    else if(cOp_==='−')res=cPrev-cur;
+    else if(cOp_==='×')res=cPrev*cur;
+    else if(cOp_==='÷')res=cur!==0?cPrev/cur:0;
+    cExpr=cPrev.toLocaleString()+' '+cOp_+' '+cur.toLocaleString()+' =';
+    cVal=String(Math.round(res*1e10)/1e10);
+    cOp_='';cFresh=true;
+  }else{
+    cPrev=cur;cOp_=op;
+    cExpr=cur.toLocaleString()+' '+op;
+    cFresh=true;
+  }
+  cUpdate();
+}
+
+
+function resetAll(){
+  mainInput.value='';
+  document.getElementById('cx-jpy').value='';
+  document.getElementById('cx-foreign').value='';
+
+  siteUrls={ebay:'',shopee:'',mercari:'',yahoo:''};
+  mainInput.focus();
+}
+
+loadSettings();
+fetchRates();
+updateConvHint();
+mainInput.focus();
+</script>
+</body>
+</html>
