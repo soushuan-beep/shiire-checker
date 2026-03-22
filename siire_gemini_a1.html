@@ -6,135 +6,111 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="創集庵リサーチ">
-<title>リサーチ</title>
+<title>創集庵リサーチ</title>
 <style>
 :root {
-  --bg: #000000; --bg2: #121212; --bg3: #1a1a1a;
-  --text: #c0c0c0; --text2: #888; --text3: #555;
-  --green: #2d6a4f; --red: #a4161a; --red-bg: rgba(164, 22, 26, 0.1);
-  --border: rgba(255,255,255,0.05); --r: 16px;
+  --bg: #000; --bg2: #121212; --text: #888; --text-focus: #fff; --green: #2d6a4f; --border: rgba(255,255,255,0.1);
 }
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-body { background: var(--bg); color: var(--text); font-family: -apple-system, sans-serif; overflow-x: hidden; }
-.app { max-width: 480px; margin: 0 auto; padding: 20px 16px 120px; }
-.hdr { padding: 10px 0; font-size: 18px; font-weight: 800; display: flex; justify-content: space-between; }
+body { background: var(--bg); color: var(--text); font-family: -apple-system, sans-serif; }
+.app { max-width: 480px; margin: 0 auto; padding: 30px 16px 120px; }
+.hdr { font-size: 16px; font-weight: 800; padding: 10px 0; margin-bottom: 20px; }
 .hdr span { color: var(--green); }
-.rate-bar { display: flex; flex-direction: column; gap: 4px; margin-bottom: 12px; padding: 10px; background: var(--bg2); border-radius: 8px; font-size: 11px; border: 1px solid var(--border); }
-.icard { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--r); padding: 16px; margin-bottom: 12px; }
-.icard input { width: 100%; background: transparent; border: none; outline: none; font-size: 22px; font-weight: 700; color: #fff; }
-.pills { display: flex; gap: 8px; margin-bottom: 12px; overflow-x: auto; }
-.pill { padding: 6px 14px; border-radius: 99px; background: var(--bg2); color: var(--text2); font-size: 12px; cursor: pointer; border: 1px solid var(--border); white-space: nowrap; }
+.rate-bar { font-size: 10px; color: #444; display: flex; gap: 15px; margin-bottom: 15px; }
+.icard { background: var(--bg2); border-radius: 12px; padding: 15px; margin-bottom: 12px; border: 1px solid var(--border); }
+.icard input { width: 100%; background: transparent; border: none; outline: none; font-size: 20px; color: #fff; }
+.pills { display: flex; gap: 8px; margin-bottom: 20px; overflow-x: auto; }
+.pill { padding: 6px 15px; border-radius: 99px; background: var(--bg2); font-size: 12px; border: 1px solid var(--border); cursor: pointer; }
 .pill.on { background: var(--green); color: #fff; border-color: var(--green); }
-.sbtn-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
-.sbtn { padding: 18px 10px; border-radius: 12px; background: var(--bg2); color: var(--text2); font-size: 14px; font-weight: 700; cursor: pointer; text-align: center; border: 1px solid var(--border); }
-.sbtn-primary { border-color: var(--red); background: var(--red-bg); color: #fff; }
-.tcard { background: var(--bg2); border-radius: var(--r); padding: 16px; margin-bottom: 12px; border: 1px solid var(--border); }
-.trow { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border); }
-.ttext { font-size: 14px; color: #fff; font-weight: 600; text-align: right; flex: 1; margin-left: 10px; }
-.conv-card { background: var(--bg2); border-radius: var(--r); padding: 16px; border: 1px solid var(--border); }
-.curr-tabs { display: flex; gap: 10px; margin-bottom: 10px; }
-.curr-tab { font-size: 12px; padding: 4px 12px; border-radius: 4px; background: var(--bg3); cursor: pointer; border: 1px solid var(--border); }
-.curr-tab.active { background: var(--green); color: #fff; border-color: var(--green); }
-.cinput-wrap { position: relative; display: flex; align-items: center; background: var(--bg3); border: 1px solid var(--border); border-radius: 8px; margin-top: 5px; }
-.cinput-wrap span { padding: 0 10px; font-size: 12px; color: var(--text3); }
-.cinput { background: transparent; border: none; outline: none; padding: 12px; width: 100%; color: #fff; font-size: 18px; }
-.rbtn { width: 100%; padding: 15px; background: #111; border: 1px solid var(--border); color: var(--text3); border-radius: 12px; margin-top: 20px; }
+.sbtn-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+.sbtn { padding: 22px 5px; border-radius: 12px; background: var(--bg2); font-size: 14px; font-weight: 700; text-align: center; border: 1px solid var(--border); color: #aaa; cursor: pointer; }
+.conv-card { background: var(--bg2); border-radius: 12px; padding: 15px; border: 1px solid var(--border); margin-top: 20px; }
+.curr-tabs { display: flex; gap: 8px; margin-bottom: 12px; }
+.tab { flex: 1; padding: 6px; font-size: 11px; text-align: center; background: #111; border-radius: 6px; border: 1px solid var(--border); }
+.tab.on { background: var(--green); color: #fff; border-color: var(--green); }
+.cinput-row { display: flex; align-items: flex-end; gap: 10px; }
+.cfield { flex: 1; }
+.cfield label { font-size: 10px; color: #444; display: block; margin-bottom: 4px; }
+.cfield input { width: 100%; background: #000; border: 1px solid var(--border); border-radius: 8px; padding: 12px; color: #fff; font-size: 22px; font-weight: 700; outline: none; }
+.calc-btn { width: 50px; height: 50px; background: #1a1a1a; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 20px; border: 1px solid var(--border); }
+.calc-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.9); display: none; flex-direction: column; justify-content: flex-end; z-index: 100; }
+.calc-modal.on { display: flex; }
+.calc-ui { background: #111; padding: 20px; border-radius: 20px 20px 0 0; }
+.calc-disp { font-size: 40px; text-align: right; padding: 20px; color: #fff; }
+.calc-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+.cb { padding: 20px; background: #222; border-radius: 10px; text-align: center; font-size: 20px; color: #fff; }
+.cb.op { color: var(--green); }
+.rbtn { width: 100%; padding: 15px; background: #000; border: 1px solid var(--border); border-radius: 12px; color: #333; margin-top: 30px; font-size: 12px; }
 </style>
 </head>
 <body>
 <div class="app">
-  <div class="hdr">創集庵リサーチ <span>Stealth</span></div>
-  <div class="rate-bar">
-    <div id="rate-usd">USD レート取得中...</div>
-    <div id="rate-twd">TWD レート取得中...</div>
-    <div style="text-align:right; color:var(--green);" onclick="fetchRates()">🔄 更新</div>
-  </div>
-  
-  <div class="icard">
-    <input type="text" id="main-input" placeholder="スキャン / 入力" autocomplete="off">
-  </div>
-
+  <div class="hdr">創集庵 <span>Stealth Check</span></div>
+  <div class="rate-bar"><div id="r-usd">USD: --</div><div id="r-twd">TWD: --</div></div>
+  <div class="icard"><input type="text" id="q" placeholder="Search..." autocomplete="off"></div>
   <div class="pills" id="pills">
     <div class="pill on" data-v="中古">中古</div><div class="pill" data-v="未開封">未開封</div><div class="pill" data-v="箱なし">箱なし</div><div class="pill" data-v="新品">新品</div>
   </div>
-
   <div class="sbtn-row">
-    <div class="sbtn" onclick="openSite('ebay')">🛒 eBay</div>
-    <div class="sbtn" onclick="openSite('shopee')">🛍 Shopee</div>
+    <div class="sbtn" onclick="go('ebay')">🛒 eBay</div>
+    <div class="sbtn" onclick="go('shopee')">🛍 Shopee</div>
   </div>
   <div class="sbtn-row">
-    <div class="sbtn sbtn-primary" onclick="openSite('mercari')">⭕ メルカリ</div>
-    <div class="sbtn sbtn-primary" onclick="openSite('yahoo')">🔨 ヤフオク</div>
+    <div class="sbtn" onclick="go('mercari')">⭕ Mercari</div>
+    <div class="sbtn" onclick="go('yahoo')">🔨 Yahoo</div>
   </div>
-
-  <div class="tcard">
-    <div class="trow"><span>🇺🇸 EN</span><span class="ttext" id="t-en">---</span></div>
-    <div class="trow"><span>🇹🇼 TW</span><span class="ttext" id="t-tw">---</span></div>
-  </div>
-
   <div class="conv-card">
-    <div class="curr-tabs">
-      <div id="tab-usd" class="curr-tab active" onclick="setCurr('USD')">USD (eBay)</div>
-      <div id="tab-twd" class="curr-tab" onclick="setCurr('TWD')">TWD (Shopee)</div>
+    <div class="curr-tabs"><div id="b-usd" class="tab on" onclick="setM('USD')">USD (eBay)</div><div id="b-twd" class="tab" onclick="setM('TWD')">TWD (Shopee)</div></div>
+    <div class="cinput-row">
+      <div class="cfield"><label>JAPAN YEN</label><input type="number" id="jpy" oninput="clc('j')"></div>
+      <div class="calc-btn" onclick="openC()">🧮</div>
     </div>
-    <div class="cinput-wrap"><span>JPY</span><input type="number" id="cx-jpy" class="cinput" placeholder="日本円" oninput="conv('jpy')"></div>
-    <div class="cinput-wrap"><span id="curr-label">USD</span><input type="number" id="cx-foreign" class="cinput" placeholder="外貨" oninput="conv('f')"></div>
+    <div class="cfield" style="margin-top:10px;"><label id="cur-l">FOREIGN (USD)</label><input type="number" id="for" oninput="clc('f')"></div>
   </div>
-
-  <button class="rbtn" onclick="location.reload()">次の商品へ</button>
+  <button class="rbtn" onclick="location.reload()">REFRESH / RESET</button>
 </div>
-
+<div id="modal" class="calc-modal" onclick="if(event.target===this)closeC()">
+  <div class="calc-ui">
+    <div class="calc-disp" id="cdisp">0</div>
+    <div class="calc-grid">
+      <div class="cb" onclick="cP('C')">C</div><div class="cb op" onclick="cO('/')">÷</div><div class="cb op" onclick="cO('*')">×</div><div class="cb op" onclick="cP('B')">←</div>
+      <div class="cb" onclick="cN('7')">7</div><div class="cb" onclick="cN('8')">8</div><div class="cb" onclick="cN('9')">9</div><div class="cb op" onclick="cO('-')">−</div>
+      <div class="cb" onclick="cN('4')">4</div><div class="cb" onclick="cN('5')">5</div><div class="cb" onclick="cN('6')">6</div><div class="cb op" onclick="cO('+')">+</div>
+      <div class="cb" onclick="cN('1')">1</div><div class="cb" onclick="cN('2')">2</div><div class="cb" onclick="cN('3')">3</div><div class="cb op" style="grid-row:span 2; display:flex; align-items:center; justify-content:center;" onclick="cE()">＝</div>
+      <div class="cb" style="grid-column:span 2" onclick="cN('0')">0</div><div class="cb" onclick="cN('.')">.</div>
+    </div>
+    <button class="rbtn" onclick="applyC()">APPLY TO JPY</button>
+  </div>
+</div>
 <script>
-let conds=new Set(['中古']), activeCurr='USD';
-const mainInput=document.getElementById('main-input');
-
-function fetchRates(){
-  fetch('https://open.er-api.com/v6/latest/JPY').then(r=>r.json()).then(d=>{
-    const usd = (1 / d.rates.USD).toFixed(2);
-    const twd = (1 / d.rates.TWD).toFixed(2);
-    localStorage.setItem('rate_USD', usd);
-    localStorage.setItem('rate_TWD', twd);
-    document.getElementById('rate-usd').textContent=`1 USD = ${usd}円`;
-    document.getElementById('rate-twd').textContent=`1 TWD = ${twd}円`;
-  }).catch(()=> {
-    document.getElementById('rate-usd').textContent='レート取得エラー';
-  });
+let cur='USD', r={USD:150, TWD:4.7}, conds=new Set(['中古']);
+const qI=document.getElementById('q'), jI=document.getElementById('jpy'), fI=document.getElementById('for');
+async function getR(){
+  try{const res=await fetch('https://open.er-api.com/v6/latest/JPY');const d=await res.json();r.USD=(1/d.rates.USD).toFixed(2);r.TWD=(1/d.rates.TWD).toFixed(2);document.getElementById('r-usd').textContent=`USD:${r.USD}`;document.getElementById('r-twd').textContent=`TWD:${r.TWD}`;}catch(e){}
 }
-
-function setCurr(c){
-  activeCurr = c;
-  document.getElementById('tab-usd').className = 'curr-tab' + (c==='USD'?' active':'');
-  document.getElementById('tab-twd').className = 'curr-tab' + (c==='TWD'?' active':'');
-  document.getElementById('curr-label').textContent = c;
-  conv('jpy');
+function setM(m){cur=m;document.getElementById('b-usd').className='tab'+(m==='USD'?' on':'');document.getElementById('b-twd').className='tab'+(m==='TWD'?' on':'');document.getElementById('cur-l').textContent='FOREIGN ('+m+')';clc('j');}
+function clc(t){const rate=r[cur];if(t==='j')fI.value=jI.value?(jI.value/rate).toFixed(2):'';else jI.value=fI.value?Math.round(fI.value*rate):'';}
+document.getElementById('pills').onclick=e=>{if(!e.target.classList.contains('pill'))return;const v=e.target.dataset.v;if(conds.has(v))conds.delete(v);else conds.add(v);document.querySelectorAll('.pill').forEach(p=>p.className='pill'+(conds.has(p.dataset.v)?' on':''));};
+async function tr(t,l){try{const res=await fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=ja&tl=${l}&dt=t&q=${encodeURIComponent(t)}`);const d=await res.json();return d[0][0][0];}catch(e){return t;}}
+async function go(site){
+  const val=qI.value;if(!val)return;const c=Array.from(conds).join(' ');
+  if(site==='mercari')window.open(`https://www.mercari.com/jp/search/?keyword=${encodeURIComponent(val)}&status=sold_out`,'_blank');
+  if(site==='yahoo')window.open(`https://auctions.yahoo.co.jp/closedsearch/closedsearch?p=${encodeURIComponent(val)}`,'_blank');
+  if(site==='ebay'){const en=await tr(val+' '+c,'en');window.open(`https://www.ebay.com/sch/i.html?_nkw=${encodeURIComponent(en)}&LH_Sold=1&LH_Complete=1`,'_blank');}
+  if(site==='shopee'){const tw=await tr(val+' '+c,'zh-TW');window.open(`https://shopee.tw/search?keyword=${encodeURIComponent(tw)}&sold_out=2`,'_blank');}
 }
-
-document.getElementById('pills').onclick=e=>{
-  if(!e.target.classList.contains('pill'))return;
-  const v=e.target.dataset.v;
-  if(conds.has(v))conds.delete(v); else conds.add(v);
-  document.querySelectorAll('.pill').forEach(x=>x.className='pill'+(conds.has(x.dataset.v)?' on':''));
-};
-
-mainInput.onkeydown=async e=>{
-  if(e.key==='Enter'){
-    const q=mainInput.value;
-    const c=Array.from(conds).join(' ');
-    document.getElementById('t-en').textContent=await trans(q+' '+c,'en');
-    document.getElementById('t-tw').textContent=await trans(q+' '+c,'zh-TW');
-  }
-};
-
-async function trans(t,l){
-  try{
-    const r=await fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=ja&tl=${l}&dt=t&q=${encodeURIComponent(t)}`);
-    const d=await r.json(); return d[0][0][0];
-  }catch(e){return t;}
-}
-
-function openSite(s){
-  const q=encodeURIComponent(mainInput.value);
-  const en=encodeURIComponent(document.getElementById('t-en').textContent);
-  const tw=encodeURIComponent(document.getElementById('t-tw').textContent);
-  const urls={
-    mercari:`https
+let cS='0', cOp='', cV=0, cW=true;
+function openC(){document.getElementById('modal').classList.add('on');cS=jI.value||'0';uC();}
+function closeC(){document.getElementById('modal').classList.remove('on');}
+function uC(){document.getElementById('cdisp').textContent=cS;}
+function nC(){cS='0';cOp='';cV=0;cW=true;uC();}
+function nN(n){if(cW){cS=n;cW=false;}else{cS=cS==='0'?n:cS+n;}uC();}
+function cN(n){if(cW){cS=n;cW=false;}else{cS=cS==='0'?n:cS+n;}uC();}
+function cP(p){if(p==='C')nC();if(p==='B'){cS=cS.length>1?cS.slice(0,-1):'0';uC();}}
+function cO(o){cV=parseFloat(cS);cOp=o;cW=true;}
+function cE(){const n=parseFloat(cS);if(cOp==='+')cS=String(cV+n);if(cOp==='-')cS=String(cV-n);if(cOp==='*')cS=String(cV*n);if(cOp==='/')cS=String(cV/n);cOp='';cW=true;uC();}
+function applyC(){jI.value=Math.round(parseFloat(cS));clc('j');closeC();}
+getR();
+</script>
+</body>
+</html>
