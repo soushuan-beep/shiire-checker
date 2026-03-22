@@ -5,26 +5,27 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="リサーチ">
-<title>リサーチ</title>
+<meta name="apple-mobile-web-app-title" content="創集庵リサーチ">
+<title>創集庵リサーチ v5m</title>
 <style>
 :root {
-  --bg: #000; --bg2: #121212; --text: #888; --text-focus: #fff; --green: #2d6a4f; --border: rgba(255,255,255,0.1);
+  --bg: #000; --bg2: #121212; --text: #888; --green: #2d6a4f; --border: rgba(255,255,255,0.1);
 }
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 body { background: var(--bg); color: var(--text); font-family: -apple-system, sans-serif; }
-.app { max-width: 480px; margin: 0 auto; padding: 30px 16px 120px; }
-.hdr { font-size: 16px; font-weight: 800; padding: 10px 0; margin-bottom: 20px; }
+.app { max-width: 480px; margin: 0 auto; padding: 20px 16px 120px; }
+.hdr { font-size: 16px; font-weight: 800; padding: 10px 0; border-bottom: 1px solid var(--border); margin-bottom: 15px; }
 .hdr span { color: var(--green); }
-.rate-bar { font-size: 10px; color: #444; display: flex; gap: 15px; margin-bottom: 15px; }
-.icard { background: var(--bg2); border-radius: 12px; padding: 15px; margin-bottom: 12px; border: 1px solid var(--border); }
-.icard input { width: 100%; background: transparent; border: none; outline: none; font-size: 20px; color: #fff; }
-.pills { display: flex; gap: 8px; margin-bottom: 20px; overflow-x: auto; }
+.rate-bar { font-size: 10px; color: #444; display: flex; gap: 15px; margin-bottom: 10px; }
+.icard { background: var(--bg2); border-radius: 12px; padding: 15px; margin-bottom: 12px; border: 1px solid var(--border); display: flex; align-items: center; gap: 10px; }
+.icard input { flex: 1; background: transparent; border: none; outline: none; font-size: 20px; color: #fff; font-weight: 700; }
+.lens-btn { font-size: 20px; color: #444; }
+.pills { display: flex; gap: 8px; margin-bottom: 15px; overflow-x: auto; }
 .pill { padding: 6px 15px; border-radius: 99px; background: var(--bg2); font-size: 12px; border: 1px solid var(--border); cursor: pointer; }
 .pill.on { background: var(--green); color: #fff; border-color: var(--green); }
-.sbtn-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
-.sbtn { padding: 22px 5px; border-radius: 12px; background: var(--bg2); font-size: 14px; font-weight: 700; text-align: center; border: 1px solid var(--border); color: #aaa; cursor: pointer; }
-.conv-card { background: var(--bg2); border-radius: 12px; padding: 15px; border: 1px solid var(--border); margin-top: 20px; }
+.sbtn-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+.sbtn { padding: 20px 5px; border-radius: 12px; background: var(--bg2); font-size: 14px; font-weight: 700; text-align: center; border: 1px solid var(--border); color: #aaa; cursor: pointer; }
+.conv-card { background: var(--bg2); border-radius: 12px; padding: 15px; border: 1px solid var(--border); margin-top: 15px; }
 .curr-tabs { display: flex; gap: 8px; margin-bottom: 12px; }
 .tab { flex: 1; padding: 6px; font-size: 11px; text-align: center; background: #111; border-radius: 6px; border: 1px solid var(--border); }
 .tab.on { background: var(--green); color: #fff; border-color: var(--green); }
@@ -40,14 +41,17 @@ body { background: var(--bg); color: var(--text); font-family: -apple-system, sa
 .calc-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
 .cb { padding: 20px; background: #222; border-radius: 10px; text-align: center; font-size: 20px; color: #fff; }
 .cb.op { color: var(--green); }
-.rbtn { width: 100%; padding: 15px; background: #000; border: 1px solid var(--border); border-radius: 12px; color: #333; margin-top: 30px; font-size: 12px; }
+.rbtn { width: 100%; padding: 15px; background: #000; border: 1px solid var(--border); border-radius: 12px; color: #333; margin-top: 20px; font-size: 12px; }
 </style>
 </head>
 <body>
 <div class="app">
-  <div class="hdr">創集庵 <span>Stealth Check</span></div>
+  <div class="hdr">創集庵 <span>v5m Stealth</span></div>
   <div class="rate-bar"><div id="r-usd">USD: --</div><div id="r-twd">TWD: --</div></div>
-  <div class="icard"><input type="text" id="q" placeholder="Search..." autocomplete="off"></div>
+  <div class="icard">
+    <input type="text" id="q" placeholder="Scan or Type..." autocomplete="off">
+    <div class="lens-btn" onclick="window.open('https://lens.google.com/','_blank')">📷</div>
+  </div>
   <div class="pills" id="pills">
     <div class="pill on" data-v="中古">中古</div><div class="pill" data-v="未開封">未開封</div><div class="pill" data-v="箱なし">箱なし</div><div class="pill" data-v="新品">新品</div>
   </div>
@@ -61,13 +65,10 @@ body { background: var(--bg); color: var(--text); font-family: -apple-system, sa
   </div>
   <div class="conv-card">
     <div class="curr-tabs"><div id="b-usd" class="tab on" onclick="setM('USD')">USD (eBay)</div><div id="b-twd" class="tab" onclick="setM('TWD')">TWD (Shopee)</div></div>
-    <div class="cinput-row">
-      <div class="cfield"><label>JAPAN YEN</label><input type="number" id="jpy" oninput="clc('j')"></div>
-      <div class="calc-btn" onclick="openC()">🧮</div>
-    </div>
+    <div class="cinput-row"><div class="cfield"><label>JPY</label><input type="number" id="jpy" oninput="clc('j')"></div><div class="calc-btn" onclick="openC()">🧮</div></div>
     <div class="cfield" style="margin-top:10px;"><label id="cur-l">FOREIGN (USD)</label><input type="number" id="for" oninput="clc('f')"></div>
   </div>
-  <button class="rbtn" onclick="location.reload()">REFRESH / RESET</button>
+  <button class="rbtn" onclick="location.reload()">RESET PAGE</button>
 </div>
 <div id="modal" class="calc-modal" onclick="if(event.target===this)closeC()">
   <div class="calc-ui">
@@ -79,7 +80,7 @@ body { background: var(--bg); color: var(--text); font-family: -apple-system, sa
       <div class="cb" onclick="cN('1')">1</div><div class="cb" onclick="cN('2')">2</div><div class="cb" onclick="cN('3')">3</div><div class="cb op" style="grid-row:span 2; display:flex; align-items:center; justify-content:center;" onclick="cE()">＝</div>
       <div class="cb" style="grid-column:span 2" onclick="cN('0')">0</div><div class="cb" onclick="cN('.')">.</div>
     </div>
-    <button class="rbtn" onclick="applyC()">APPLY TO JPY</button>
+    <button class="rbtn" onclick="applyC()">APPLY</button>
   </div>
 </div>
 <script>
@@ -93,20 +94,25 @@ function clc(t){const rate=r[cur];if(t==='j')fI.value=jI.value?(jI.value/rate).t
 document.getElementById('pills').onclick=e=>{if(!e.target.classList.contains('pill'))return;const v=e.target.dataset.v;if(conds.has(v))conds.delete(v);else conds.add(v);document.querySelectorAll('.pill').forEach(p=>p.className='pill'+(conds.has(p.dataset.v)?' on':''));};
 async function tr(t,l){try{const res=await fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=ja&tl=${l}&dt=t&q=${encodeURIComponent(t)}`);const d=await res.json();return d[0][0][0];}catch(e){return t;}}
 async function go(site){
-  const val=qI.value;if(!val)return;const c=Array.from(conds).join(' ');
+  let val=qI.value;if(!val)return;const c=Array.from(conds).join(' ');
+  const isJan=/^\d{8,14}$/.test(val.trim());
   if(site==='mercari')window.open(`https://www.mercari.com/jp/search/?keyword=${encodeURIComponent(val)}&status=sold_out`,'_blank');
   if(site==='yahoo')window.open(`https://auctions.yahoo.co.jp/closedsearch/closedsearch?p=${encodeURIComponent(val)}`,'_blank');
-  if(site==='ebay'){const en=await tr(val+' '+c,'en');window.open(`https://www.ebay.com/sch/i.html?_nkw=${encodeURIComponent(en)}&LH_Sold=1&LH_Complete=1`,'_blank');}
-  if(site==='shopee'){const tw=await tr(val+' '+c,'zh-TW');window.open(`https://shopee.tw/search?keyword=${encodeURIComponent(tw)}&sold_out=2`,'_blank');}
+  if(site==='ebay'){
+    let search = isJan ? val : await tr(val+' '+c,'en');
+    window.open(`https://www.ebay.com/sch/i.html?_nkw=${encodeURIComponent(search)}&LH_Sold=1&LH_Complete=1`,'_blank');
+  }
+  if(site==='shopee'){
+    let search = isJan ? val : await tr(val+' '+c,'zh-TW');
+    window.open(`https://shopee.tw/search?keyword=${encodeURIComponent(search)}&sold_out=2`,'_blank');
+  }
 }
 let cS='0', cOp='', cV=0, cW=true;
 function openC(){document.getElementById('modal').classList.add('on');cS=jI.value||'0';uC();}
 function closeC(){document.getElementById('modal').classList.remove('on');}
 function uC(){document.getElementById('cdisp').textContent=cS;}
-function nC(){cS='0';cOp='';cV=0;cW=true;uC();}
-function nN(n){if(cW){cS=n;cW=false;}else{cS=cS==='0'?n:cS+n;}uC();}
 function cN(n){if(cW){cS=n;cW=false;}else{cS=cS==='0'?n:cS+n;}uC();}
-function cP(p){if(p==='C')nC();if(p==='B'){cS=cS.length>1?cS.slice(0,-1):'0';uC();}}
+function cP(p){if(p==='C'){cS='0';cOp='';cV=0;cW=true;}if(p==='B'){cS=cS.length>1?cS.slice(0,-1):'0';}uC();}
 function cO(o){cV=parseFloat(cS);cOp=o;cW=true;}
 function cE(){const n=parseFloat(cS);if(cOp==='+')cS=String(cV+n);if(cOp==='-')cS=String(cV-n);if(cOp==='*')cS=String(cV*n);if(cOp==='/')cS=String(cV/n);cOp='';cW=true;uC();}
 function applyC(){jI.value=Math.round(parseFloat(cS));clc('j');closeC();}
