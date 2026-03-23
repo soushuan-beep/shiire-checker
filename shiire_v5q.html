@@ -475,7 +475,7 @@ async function doAiKeyword(){
 
   const condStr=Array.from(conds).join('、');
 
-  const geminiUrl=`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${s.apikey}`;
+  const geminiUrl=`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${s.apikey}`;
 
   const prompt=`日本語の商品名を、eBayとShopee台湾の検索キーワードに変換してください。
 
@@ -503,7 +503,7 @@ TW3: キーワード`;
       headers:{'Content-Type':'application/json'},
       body:JSON.stringify({
         contents:[{parts:[{text:prompt}]}],
-        generationConfig:{temperature:0.3,maxOutputTokens:256}
+        generationConfig:{temperature:0.3,maxOutputTokens:300}
       })
     });
     if(!res.ok){
