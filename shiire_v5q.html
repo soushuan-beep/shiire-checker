@@ -477,25 +477,22 @@ async function doAiKeyword(){
 
   const geminiUrl=`https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${s.apikey}`;
 
-  const prompt=`日本語の商品名を、eBayとShopee台湾の検索キーワードに変換してください。
+  const prompt=`以下の日本語商品名を、eBayとShopee台湾の検索キーワードに変換してください。
 
 商品名：${q}
 
-eBayルール：
-・英語・3〜6単語・状態語（used,vintageなど）は付けない
-・ブランド名は正確に・一般的に検索されやすい自然な英語
+ルール：
+・状態語（used/二手など）は付けない
+・ブランド名は正確に
+・3〜6単語程度
 
-Shopeeルール：
-・繁体字・台湾人が実際に検索する言葉・状態語（二手など）は付けない
-・ブランド名は台湾での通称を使う
-
-出力形式（この形式のみ・説明不要）：
-EN1: キーワード
-EN2: キーワード
-EN3: キーワード
-TW1: キーワード
-TW2: キーワード
-TW3: キーワード`;
+必ず以下の形式のみで出力してください（説明・空行・余分なテキスト不要）：
+EN1|キーワード
+EN2|キーワード
+EN3|キーワード
+TW1|キーワード
+TW2|キーワード
+TW3|キーワード`;
 
   const callGemini=async()=>{
     const res=await fetch(geminiUrl,{
@@ -520,11 +517,13 @@ TW3: キーワード`;
     const en=[],tw=[];
     text.split('\n').forEach(line=>{
       const trimmed=line.trim();
-      // EN1: / EN2: / EN3: 形式
-      const enMatch=trimmed.match(/^EN\d[:\s]+(.+)$/i);
-      const twMatch=trimmed.match(/^TW\d[:\s]+(.+)$/i);
-      if(enMatch&&enMatch[1].trim())en.push(enMatch[1].trim());
-      if(twMatch&&twMatch[1].trim())tw.push(twMatch[1].trim());
+      const parts=trimmed.split('|');
+      if(parts.length<2)return;
+      const key=parts[0].trim().toUpperCase();
+      const val=parts[1].trim();
+      if(!val)return;
+      if(key.startsWith('EN'))en.push(val);
+      else if(key.startsWith('TW'))tw.push(val);
     });
     return{en:en.slice(0,3),tw:tw.slice(0,3)};
   };
@@ -533,7 +532,10 @@ TW3: キーワード`;
     const text=await callGemini();
     const{en:enList,tw:twList}=parseResult(text);
 
-    if(enList.length===0||twList.length===0)throw new Error('Parse failed: '+text);
+    if(enList.length===0||twList.length===0){
+      console.error('Raw response:', text);
+      throw new Error('Parse failed: '+text.substring(0,100));
+    }
 
     aiKwCache={en:enList,tw:twList};
     renderAiList('ai-en-list',enList,'ebay');
