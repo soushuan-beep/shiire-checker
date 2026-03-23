@@ -475,43 +475,29 @@ async function doAiKeyword(){
 
   const condStr=Array.from(conds).join('、');
 
-  const promptEn=`日本語の商品名を、eBay検索に適した英語キーワードに変換してください。
-
-ルール：
-・検索に適した短いキーワードにする（3〜6単語）
-・ブランド名・作品名は正確に
-・状態（used, vintageなど）は勝手に付けない
-・一般的に検索されやすい自然な英語にする
-
-出力形式：
-① 基本キーワード
-② 少し広げたキーワード
-③ 別の言い換え
-
-説明不要、3行で出力（①②③の番号と改行のみ）
-
-入力：${q}`;
-
-  const promptTw=`日本語の商品名を、Shopee台湾検索に適した繁体字キーワードに変換してください。
-
-ルール：
-・台湾人が実際に検索する自然な繁体字
-・3〜6単語程度
-・状態（二手など）は勝手に付けない
-・ブランド名・作品名は台湾での通称を使う
-
-出力形式：
-① 基本キーワード
-② 少し広げたキーワード
-③ 別の言い換え
-
-説明不要、3行で出力（①②③の番号と改行のみ）
-
-入力：${q}`;
-
   const geminiUrl=`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${s.apikey}`;
 
-  const callGemini=async(prompt)=>{
+  const prompt=`日本語の商品名を、eBayとShopee台湾の検索キーワードに変換してください。
+
+商品名：${q}
+
+eBayルール：
+・英語・3〜6単語・状態語（used,vintageなど）は付けない
+・ブランド名は正確に・一般的に検索されやすい自然な英語
+
+Shopeeルール：
+・繁体字・台湾人が実際に検索する言葉・状態語（二手など）は付けない
+・ブランド名は台湾での通称を使う
+
+出力形式（この形式のみ・説明不要）：
+EN1: キーワード
+EN2: キーワード
+EN3: キーワード
+TW1: キーワード
+TW2: キーワード
+TW3: キーワード`;
+
+  const callGemini=async()=>{
     const res=await fetch(geminiUrl,{
       method:'POST',
       headers:{'Content-Type':'application/json'},
@@ -525,29 +511,28 @@ async function doAiKeyword(){
       throw new Error('API Error: '+(err.error?.message||res.status));
     }
     const d=await res.json();
-    // レスポンス構造を安全に取得
     const text=d?.candidates?.[0]?.content?.parts?.[0]?.text||'';
     if(!text)throw new Error('Empty response');
     return text;
   };
 
-  const parsePatterns=text=>{
-    return text.split('\n')
-      .map(l=>l.replace(/^[\s①②③\d][\.．\)）\s]*/,'').trim())
-      .filter(l=>l.length>=2)
-      .slice(0,3);
+  const parseResult=text=>{
+    const en=[],tw=[];
+    text.split('\n').forEach(line=>{
+      const m=line.match(/^(EN|TW)(\d):\s*(.+)$/);
+      if(!m)return;
+      const kw=m[3].trim();
+      if(m[1]==='EN')en.push(kw);
+      else tw.push(kw);
+    });
+    return{en:en.slice(0,3),tw:tw.slice(0,3)};
   };
 
   try{
-    const [textEn,textTw]=await Promise.all([
-      callGemini(promptEn),
-      callGemini(promptTw)
-    ]);
+    const text=await callGemini();
+    const{en:enList,tw:twList}=parseResult(text);
 
-    const enList=parsePatterns(textEn);
-    const twList=parsePatterns(textTw);
-
-    if(enList.length===0||twList.length===0)throw new Error('Parse failed');
+    if(enList.length===0||twList.length===0)throw new Error('Parse failed: '+text);
 
     aiKwCache={en:enList,tw:twList};
     renderAiList('ai-en-list',enList,'ebay');
