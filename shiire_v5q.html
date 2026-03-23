@@ -500,7 +500,7 @@ TW3|キーワード`;
       headers:{'Content-Type':'application/json'},
       body:JSON.stringify({
         contents:[{parts:[{text:prompt}]}],
-        generationConfig:{temperature:0.3,maxOutputTokens:300}
+        generationConfig:{temperature:0.3,maxOutputTokens:512}
       })
     });
     if(!res.ok){
@@ -532,14 +532,17 @@ TW3|キーワード`;
     const text=await callGemini();
     const{en:enList,tw:twList}=parseResult(text);
 
-    if(enList.length===0||twList.length===0){
+    if(enList.length===0&&twList.length===0){
       console.error('Raw response:', text);
       throw new Error('Parse failed: '+text.substring(0,100));
     }
+    // 片方だけでも取れていれば表示する
+    const finalEn=enList.length>0?enList:['(取得できませんでした)'];
+    const finalTw=twList.length>0?twList:['(取得できませんでした)'];
 
-    aiKwCache={en:enList,tw:twList};
-    renderAiList('ai-en-list',enList,'ebay');
-    renderAiList('ai-tw-list',twList,'shopee');
+    aiKwCache={en:finalEn,tw:finalTw};
+    renderAiList('ai-en-list',finalEn,'ebay');
+    renderAiList('ai-tw-list',finalTw,'shopee');
     aiArea.classList.add('show');
     btn.textContent='✨ 再提案する';
     btn.classList.remove('loading');
