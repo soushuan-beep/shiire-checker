@@ -477,22 +477,20 @@ async function doAiKeyword(){
 
   const geminiUrl=`https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${s.apikey}`;
 
-  const prompt=`以下の日本語商品名を、eBayとShopee台湾の検索キーワードに変換してください。
+  const prompt=`以下の日本語商品名を変換してください。
 
 商品名：${q}
 
-ルール：
-・状態語（used/二手など）は付けない
-・ブランド名は正確に
-・3〜6単語程度
+必ず以下の6行を出力してください（他は何も書かない）：
+EN1|英語キーワード
+EN2|英語キーワード
+EN3|英語キーワード
+TW1|繁体字キーワード
+TW2|繁体字キーワード
+TW3|繁体字キーワード
 
-必ず以下の形式のみで出力してください（説明・空行・余分なテキスト不要）：
-EN1|キーワード
-EN2|キーワード
-EN3|キーワード
-TW1|キーワード
-TW2|キーワード
-TW3|キーワード`;
+EN=eBay英語（3〜6単語・状態語なし）
+TW=Shopee台湾繁体字（台湾人が検索する言葉・状態語なし）`;
 
   const callGemini=async()=>{
     const res=await fetch(geminiUrl,{
@@ -500,7 +498,7 @@ TW3|キーワード`;
       headers:{'Content-Type':'application/json'},
       body:JSON.stringify({
         contents:[{parts:[{text:prompt}]}],
-        generationConfig:{temperature:0.3,maxOutputTokens:512}
+        generationConfig:{temperature:0.2,maxOutputTokens:1024}
       })
     });
     if(!res.ok){
