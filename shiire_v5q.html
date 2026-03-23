@@ -420,11 +420,11 @@ async function doTranslate(){
   }
   hint.textContent='翻訳中...';
 
-  // 状態ワードを追加
+  // 状態ワードを商品名に追加して翻訳
   const condWords=Array.from(conds).join(' ');
   const fullQ=condWords?q+' '+condWords:q;
 
-  // Google翻訳→辞書の順（Claude APIは翻訳には使わない）
+  // Google翻訳→辞書の順
   let res=null;
   let method='';
 
@@ -448,9 +448,11 @@ async function doTranslate(){
   lastTranslated={en:res.en,tw:res.tw};
   updateLinks(res.en,res.tw);
 
-  // APIキーがあればAIキーワードボタンを表示
-  const s=JSON.parse(localStorage.getItem('sc_settings')||'{}');
-  if(s.apikey){
+  // APIキーチェック（sc_settingsから直接読む）
+  const rawSettings=localStorage.getItem('sc_settings')||'{}';
+  const sCheck=JSON.parse(rawSettings);
+  const hasKey=sCheck.apikey&&sCheck.apikey.trim().length>0;
+  if(hasKey){
     aiBtn.textContent='✨ AIでeBay/Shopeeキーワードを最適化';
     aiBtn.classList.add('show');
     aiBtn.classList.remove('loading');
@@ -507,28 +509,45 @@ async function doAiKeyword(){
 
 入力：${q}`;
 
-  try{
-    const [resEn,resTw]=await Promise.all([
-      fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${s.apikey}`,{
-        method:'POST',headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({contents:[{parts:[{text:promptEn}]}]})
-      }),
-      fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${s.apikey}`,{
-        method:'POST',headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({contents:[{parts:[{text:promptTw}]}]})
+  const geminiUrl=`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${s.apikey}`;
+
+  const callGemini=async(prompt)=>{
+    const res=await fetch(geminiUrl,{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        contents:[{parts:[{text:prompt}]}],
+        generationConfig:{temperature:0.3,maxOutputTokens:256}
       })
+    });
+    if(!res.ok){
+      const err=await res.json().catch(()=>({}));
+      throw new Error('API Error: '+(err.error?.message||res.status));
+    }
+    const d=await res.json();
+    // レスポンス構造を安全に取得
+    const text=d?.candidates?.[0]?.content?.parts?.[0]?.text||'';
+    if(!text)throw new Error('Empty response');
+    return text;
+  };
+
+  const parsePatterns=text=>{
+    return text.split('\n')
+      .map(l=>l.replace(/^[\s①②③\d][\.．\)）\s]*/,'').trim())
+      .filter(l=>l.length>=2)
+      .slice(0,3);
+  };
+
+  try{
+    const [textEn,textTw]=await Promise.all([
+      callGemini(promptEn),
+      callGemini(promptTw)
     ]);
-    const [dEn,dTw]=await Promise.all([resEn.json(),resTw.json()]);
 
-    const parsePatterns=text=>{
-      return text.split('\n')
-        .map(l=>l.replace(/^[①②③\d][\.．\)）\s]*/,'').trim())
-        .filter(l=>l.length>0)
-        .slice(0,3);
-    };
+    const enList=parsePatterns(textEn);
+    const twList=parsePatterns(textTw);
 
-    const enList=parsePatterns(dEn.candidates[0].content.parts[0].text);
-    const twList=parsePatterns(dTw.candidates[0].content.parts[0].text);
+    if(enList.length===0||twList.length===0)throw new Error('Parse failed');
 
     aiKwCache={en:enList,tw:twList};
     renderAiList('ai-en-list',enList,'ebay');
@@ -537,8 +556,12 @@ async function doAiKeyword(){
     btn.textContent='✨ 再提案する';
     btn.classList.remove('loading');
   }catch(e){
-    btn.textContent='✨ AIでeBay/Shopeeキーワードを最適化';
+    console.error('Gemini error:',e);
+    btn.textContent='❌ エラー（APIキーを確認）';
     btn.classList.remove('loading');
+    setTimeout(()=>{
+      btn.textContent='✨ AIでeBay/Shopeeキーワードを最適化';
+    },3000);
   }
 }
 
