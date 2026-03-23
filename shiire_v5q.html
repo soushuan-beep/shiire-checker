@@ -519,11 +519,12 @@ TW3: キーワード`;
   const parseResult=text=>{
     const en=[],tw=[];
     text.split('\n').forEach(line=>{
-      const m=line.match(/^(EN|TW)(\d):\s*(.+)$/);
-      if(!m)return;
-      const kw=m[3].trim();
-      if(m[1]==='EN')en.push(kw);
-      else tw.push(kw);
+      const trimmed=line.trim();
+      // EN1: / EN2: / EN3: 形式
+      const enMatch=trimmed.match(/^EN\d[:\s]+(.+)$/i);
+      const twMatch=trimmed.match(/^TW\d[:\s]+(.+)$/i);
+      if(enMatch&&enMatch[1].trim())en.push(enMatch[1].trim());
+      if(twMatch&&twMatch[1].trim())tw.push(twMatch[1].trim());
     });
     return{en:en.slice(0,3),tw:tw.slice(0,3)};
   };
