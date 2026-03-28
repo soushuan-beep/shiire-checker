@@ -292,11 +292,10 @@
         : `https://auctions.yahoo.co.jp/search/search?p=${encodeURIComponent(q)}&auccat=${cat.yahoo}`;
       return base;
     } else {
-      // メルカリ：category_idはURLパラメータで渡す（効かない端末もある）
-      const catParam = cat.mercari ? `&category_id=${cat.mercari}` : '';
+      // メルカリ：カテゴリー絞りなし（出品者のカテゴリ設定がバラバラなためキーワードのみ）
       return sold
-        ? `https://jp.mercari.com/search?keyword=${encodeURIComponent(q)}&status=sold_out${catParam}`
-        : `https://jp.mercari.com/search?keyword=${encodeURIComponent(q)}&status=on_sale${catParam}`;
+        ? `https://jp.mercari.com/search?keyword=${encodeURIComponent(q)}&status=sold_out`
+        : `https://jp.mercari.com/search?keyword=${encodeURIComponent(q)}&status=on_sale`;
     }
   }
 
