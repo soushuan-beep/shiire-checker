@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>search</title>
+<style>
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  html, body {
+    height: 100%;
+    overflow: hidden;
+    background: #1e1e1e;
+  }
+
+  body {
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    font-family: -apple-system, BlinkMacSystemFont, 'Hiragino Sans', sans-serif;
+    perspective: 600px;
+  }
+
+  .container {
+    width: 100%;
+    max-width: 420px;
+    padding: 20px 18px 44px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  /* 入力欄 */
+  .input-row {
+    display: flex;
+    align-items: center;
+    background: #2a2a2a;
+    border: 1px solid #3a3a3a;
+    border-radius: 8px;
+    padding: 0 10px 0 14px;
+    gap: 6px;
+  }
+
+  #query {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: #c8c8c8;
+    font-size: 16px;
+    padding: 13px 0;
+    caret-color: #aaa;
+  }
+
+  #query::placeholder {
+    color: #555;
+  }
+
+  /* ブラウザ標準クリアボタン非表示 */
+  #query::-webkit-search-cancel-button {
+    -webkit-appearance: none;
+    appearance: none;
+  }
+
+  .clear-btn {
+    background: none;
+    border: none;
+    color: #555;
+    font-size: 16px;
+    cursor: pointer;
+    padding: 6px;
+    line-height: 1;
+    transition: color 0.15s;
+    flex-shrink: 0;
+  }
+
+  .clear-btn:active {
+    color: #999;
+  }
+
+  /* トグル */
+  .toggle-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .toggle-label {
+    font-size: 11px;
+    color: #555;
+    min-width: 52px;
+    transition: color 0.2s;
+  }
+
+  .toggle-label.active {
+    color: #aaa;
+  }
+
+  .toggle-wrap {
+    position: relative;
+    width: 46px;
+    height: 24px;
+    flex-shrink: 0;
+  }
+
+  .toggle-wrap input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+    position: absolute;
+  }
+
+  .toggle-track {
+    position: absolute;
+    inset: 0;
+    background: #2a2a2a;
+    border: 1px solid #3a3a3a;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+
+  .toggle-track::after {
+    content: '';
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 16px;
+    height: 16px;
+    background: #666;
+    border-radius: 50%;
+    transition: transform 0.2s, background 0.2s;
+  }
+
+  .toggle-wrap input:checked + .toggle-track {
+    background: #1e2e1e;
+    border-color: #3a5a3a;
+  }
+
+  .toggle-wrap input:checked + .toggle-track::after {
+    transform: translateX(22px);
+    background: #5a9a5a;
+  }
+
+  /* ボタン */
+  .btn-row {
+    display: flex;
+    gap: 10px;
+  }
+
+  .btn {
+    flex: 1;
+    padding: 15px 0;
+    border: 1px solid #3a3a3a;
+    border-radius: 8px;
+    background: #2a2a2a;
+    color: #888;
+    font-size: 13px;
+    letter-spacing: 0.03em;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s, border-color 0.15s;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+
+  .btn:active {
+    background: #333;
+    color: #bbb;
+    border-color: #4a4a4a;
+  }
+
+  /* 最後に使ったサイト表示 */
+  .last-site {
+    text-align: center;
+    font-size: 10px;
+    color: #3a3a3a;
+    letter-spacing: 0.05em;
+    height: 12px;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="input-row">
+    <input type="search" id="query" placeholder="商品名" autocomplete="off" autocorrect="off" spellcheck="false" enterkeyhint="search">
+    <button class="clear-btn" id="clearBtn" aria-label="クリア">✕</button>
+  </div>
+
+  <div class="toggle-row">
+    <span class="toggle-label active" id="labelLeft">販売中</span>
+    <div class="toggle-wrap">
+      <input type="checkbox" id="toggle">
+      <label class="toggle-track" for="toggle"></label>
+    </div>
+    <span class="toggle-label" id="labelRight">落札済</span>
+  </div>
+
+  <div class="btn-row">
+    <button class="btn" id="btnYahoo">ヤフオク</button>
+    <button class="btn" id="btnMercari">メルカリ</button>
+  </div>
+
+  <div class="last-site" id="lastSite"></div>
+
+</div>
+
+<script>
+  const queryEl   = document.getElementById('query');
+  const clearBtn  = document.getElementById('clearBtn');
+  const toggle    = document.getElementById('toggle');
+  const labelL    = document.getElementById('labelLeft');
+  const labelR    = document.getElementById('labelRight');
+  const btnYahoo  = document.getElementById('btnYahoo');
+  const btnMercari= document.getElementById('btnMercari');
+  const lastSite  = document.getElementById('lastSite');
+
+  const TOGGLE_KEY = 'ss_toggle';
+  const LAST_KEY   = 'ss_last';
+
+  toggle.checked = localStorage.getItem(TOGGLE_KEY) === '1';
+  updateToggleLabel();
+
+  let lastUsed = localStorage.getItem(LAST_KEY) || null;
+  if (lastUsed) lastSite.textContent = '↵ ' + lastUsed;
+
+  function normalize(str) {
+    str = str.replace(/[Ａ-Ｚａ-ｚ０-９]/g, c =>
+      String.fromCharCode(c.charCodeAt(0) - 0xFEE0)
+    );
+    str = str.toUpperCase();
+    str = str.replace(/([\u3000-\u9FFF\uF900-\uFAFF\uFF66-\uFF9F])([A-Z0-9])/g, '$1 $2');
+    str = str.replace(/([A-Z0-9])([\u3000-\u9FFF\uF900-\uFAFF\uFF66-\uFF9F])/g, '$1 $2');
+    return str.trim();
+  }
+
+  function buildUrl(site) {
+    const q = normalize(queryEl.value);
+    if (!q) return null;
+    const sold = toggle.checked;
+
+    if (site === 'yahoo') {
+      return sold
+        ? `https://auctions.yahoo.co.jp/closedsearch/closedsearch?p=${encodeURIComponent(q)}&auccat=0&f=0x2`
+        : `https://auctions.yahoo.co.jp/search/search?p=${encodeURIComponent(q)}&auccat=0`;
+    } else {
+      return sold
+        ? `https://jp.mercari.com/search?keyword=${encodeURIComponent(q)}&status=sold_out`
+        : `https://jp.mercari.com/search?keyword=${encodeURIComponent(q)}&status=on_sale`;
+    }
+  }
+
+  function search(site) {
+    const url = buildUrl(site);
+    if (!url) { queryEl.focus(); return; }
+    window.open(url, '_blank');
+    const name = site === 'yahoo' ? 'ヤフオク' : 'メルカリ';
+    lastUsed = name;
+    localStorage.setItem(LAST_KEY, name);
+    lastSite.textContent = '↵ ' + name;
+  }
+
+  btnYahoo.addEventListener('click',   () => search('yahoo'));
+  btnMercari.addEventListener('click', () => search('mercari'));
+
+  queryEl.addEventListener('keydown', e => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      if (lastUsed === 'メルカリ') search('mercari');
+      else search('yahoo');
+    }
+  });
+
+  clearBtn.addEventListener('click', () => {
+    queryEl.value = '';
+    queryEl.focus();
+  });
+
+  toggle.addEventListener('change', () => {
+    localStorage.setItem(TOGGLE_KEY, toggle.checked ? '1' : '0');
+    updateToggleLabel();
+  });
+
+  function updateToggleLabel() {
+    if (toggle.checked) {
+      labelL.classList.remove('active');
+      labelR.classList.add('active');
+    } else {
+      labelL.classList.add('active');
+      labelR.classList.remove('active');
+    }
+  }
+
+  window.addEventListener('load', () => {
+    setTimeout(() => queryEl.focus(), 100);
+  });
+</script>
+</body>
+</html>
