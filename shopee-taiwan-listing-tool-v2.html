@@ -1,0 +1,1088 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shopee台湾 出品補助ツール</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0a0e14;
+            --bg-secondary: #151a23;
+            --bg-tertiary: #1f2937;
+            --bg-hover: #2a3441;
+            --text-primary: #e5e7eb;
+            --text-secondary: #9ca3af;
+            --text-muted: #6b7280;
+            --accent-primary: #10b981;
+            --accent-secondary: #3b82f6;
+            --accent-warning: #f59e0b;
+            --accent-error: #ef4444;
+            --border-color: #374151;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Noto Sans TC', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #0a0e14 0%, #151a23 100%);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1800px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+            animation: fadeInDown 0.6s ease-out;
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+        }
+
+        .header p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: 480px 1fr;
+            gap: 2rem;
+            animation: fadeIn 0.8s ease-out 0.2s backwards;
+        }
+
+        .section {
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            padding: 1.75rem;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid var(--border-color);
+        }
+
+        .section-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .section-title::before {
+            content: '';
+            width: 4px;
+            height: 1.1rem;
+            background: var(--accent-primary);
+            border-radius: 2px;
+        }
+
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .form-label .required {
+            color: var(--accent-error);
+            margin-left: 0.25rem;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 0.95rem;
+            transition: all 0.2s ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+        }
+
+        .form-input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .button-group {
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+        }
+
+        .btn-toggle {
+            flex: 1;
+            min-width: 100px;
+            padding: 0.65rem 1rem;
+            background: var(--bg-tertiary);
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+
+        .btn-toggle:hover {
+            background: var(--bg-hover);
+            border-color: var(--text-muted);
+        }
+
+        .btn-toggle.active {
+            background: var(--accent-primary);
+            border-color: var(--accent-primary);
+            color: white;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+        }
+
+        .toggle-switch {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem;
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .toggle-switch:hover {
+            background: var(--bg-hover);
+        }
+
+        .toggle-switch input {
+            display: none;
+        }
+
+        .toggle-slider {
+            position: relative;
+            width: 48px;
+            height: 26px;
+            background: var(--border-color);
+            border-radius: 13px;
+            transition: all 0.3s ease;
+        }
+
+        .toggle-slider::after {
+            content: '';
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+
+        .toggle-switch input:checked + .toggle-slider {
+            background: var(--accent-primary);
+        }
+
+        .toggle-switch input:checked + .toggle-slider::after {
+            transform: translateX(22px);
+        }
+
+        .toggle-label {
+            flex: 1;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .collapsible-section {
+            margin-top: 1.5rem;
+            border-top: 1px solid var(--border-color);
+            padding-top: 1.5rem;
+        }
+
+        .collapsible-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 6px;
+            transition: background 0.2s ease;
+        }
+
+        .collapsible-header:hover {
+            background: var(--bg-tertiary);
+        }
+
+        .collapsible-title {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            font-weight: 500;
+        }
+
+        .collapsible-icon {
+            color: var(--text-muted);
+            transition: transform 0.3s ease;
+        }
+
+        .collapsible-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease, padding 0.3s ease;
+        }
+
+        .collapsible-content.active {
+            max-height: 500px;
+            padding-top: 1rem;
+        }
+
+        .collapsible-icon.active {
+            transform: rotate(180deg);
+        }
+
+        .output-section {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .output-card {
+            background: var(--bg-tertiary);
+            border-radius: 10px;
+            padding: 1.25rem;
+            border: 1px solid var(--border-color);
+            position: relative;
+        }
+
+        .output-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 0.75rem;
+        }
+
+        .output-label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .copy-btn {
+            padding: 0.4rem 0.85rem;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .copy-btn:hover {
+            background: var(--accent-secondary);
+            border-color: var(--accent-secondary);
+            color: white;
+            transform: translateY(-1px);
+        }
+
+        .copy-btn:active {
+            transform: translateY(0);
+        }
+
+        .copy-btn.copied {
+            background: var(--accent-primary);
+            border-color: var(--accent-primary);
+            color: white;
+        }
+
+        .output-content {
+            font-family: 'Noto Sans TC', sans-serif;
+            color: var(--text-primary);
+            font-size: 0.95rem;
+            line-height: 1.6;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+
+        .output-content.mono {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+        }
+
+        .rule-check {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 0.75rem;
+        }
+
+        .rule-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.6rem;
+            background: var(--bg-secondary);
+            border-radius: 6px;
+            font-size: 0.85rem;
+        }
+
+        .rule-icon {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+
+        .rule-icon.ok {
+            background: var(--accent-primary);
+            color: white;
+        }
+
+        .rule-icon.ng {
+            background: var(--accent-error);
+            color: white;
+        }
+
+        .rule-icon.warn {
+            background: var(--accent-warning);
+            color: white;
+        }
+
+        .rule-text {
+            color: var(--text-secondary);
+        }
+
+        .action-bar {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .btn-primary {
+            flex: 1;
+            padding: 1rem;
+            background: linear-gradient(135deg, var(--accent-primary) 0%, #059669 100%);
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+
+        .btn-secondary {
+            padding: 1rem 1.5rem;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            color: var(--text-primary);
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-secondary:hover {
+            background: var(--bg-hover);
+            border-color: var(--text-muted);
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .toast {
+            position: fixed;
+            top: 2rem;
+            right: 2rem;
+            background: var(--accent-primary);
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            box-shadow: var(--shadow-lg);
+            font-weight: 500;
+            z-index: 1000;
+            animation: slideInRight 0.3s ease-out;
+        }
+
+        @keyframes slideInRight {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @media (max-width: 1200px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🛍️ Shopee台湾 出品補助ツール</h1>
+            <p>30秒で規約準拠の繁体字リスティング生成 | 日本発送対応</p>
+        </div>
+
+        <div class="main-grid">
+            <!-- 左側：入力セクション -->
+            <div class="section">
+                <div class="section-title">📝 商品情報入力</div>
+
+                <div class="form-group">
+                    <label class="form-label">
+                        商品名（日本語）<span class="required">*</span>
+                    </label>
+                    <input type="text" id="productName" class="form-input" placeholder="例：ワンピース ルフィ フィギュア">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">正式商品名（任意）</label>
+                    <input type="text" id="officialName" class="form-input" placeholder="例：Portrait.Of.Pirates ワンピース ONE PIECE ルフィ">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">商品状態</label>
+                    <div class="button-group">
+                        <button class="btn-toggle" data-condition="new">新品</button>
+                        <button class="btn-toggle active" data-condition="good">状態良好</button>
+                        <button class="btn-toggle" data-condition="fair">やや傷あり</button>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="isSet">
+                        <span class="toggle-slider"></span>
+                        <span class="toggle-label">2体セット</span>
+                    </label>
+                </div>
+
+                <div class="form-group">
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="hasBox">
+                        <span class="toggle-slider"></span>
+                        <span class="toggle-label">箱あり</span>
+                    </label>
+                </div>
+
+                <!-- 折りたたみ可能セクション -->
+                <div class="collapsible-section">
+                    <div class="collapsible-header" onclick="toggleCollapsible()">
+                        <span class="collapsible-title">🔽 追加情報（任意）</span>
+                        <span class="collapsible-icon" id="collapsibleIcon">▼</span>
+                    </div>
+                    <div class="collapsible-content" id="collapsibleContent">
+                        <div class="form-group">
+                            <label class="form-label">JANコード</label>
+                            <input type="text" id="janCode" class="form-input" placeholder="4573102634252（景品の場合は空欄）">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">原産国</label>
+                            <div class="button-group">
+                                <button class="btn-toggle active" data-origin="">未選択</button>
+                                <button class="btn-toggle" data-origin="Japan">日本</button>
+                                <button class="btn-toggle" data-origin="China">中国</button>
+                                <button class="btn-toggle" data-origin="Other">その他</button>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">ブランド</label>
+                            <input type="text" id="brand" class="form-input" placeholder="例：バンダイ、メガハウス">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="action-bar">
+                    <button class="btn-primary" onclick="generateListing()">🚀 生成</button>
+                    <button class="btn-secondary" onclick="resetForm()">🔄</button>
+                </div>
+            </div>
+
+            <!-- 右側：出力セクション -->
+            <div class="section">
+                <div class="section-title">✨ 生成結果</div>
+                <div class="output-section">
+                    <!-- タイトル -->
+                    <div class="output-card">
+                        <div class="output-header">
+                            <span class="output-label">タイトル（繁體字）</span>
+                            <button class="copy-btn" onclick="copyToClipboard('outputTitle', this)">📋 コピー</button>
+                        </div>
+                        <div class="output-content" id="outputTitle">ここに生成されたタイトルが表示されます</div>
+                    </div>
+
+                    <!-- 説明文 -->
+                    <div class="output-card">
+                        <div class="output-header">
+                            <span class="output-label">說明文（繁體字）</span>
+                            <button class="copy-btn" onclick="copyToClipboard('outputDescription', this)">📋 コピー</button>
+                        </div>
+                        <div class="output-content" id="outputDescription">ここに生成された説明文が表示されます</div>
+                    </div>
+
+                    <!-- キーワード -->
+                    <div class="output-card">
+                        <div class="output-header">
+                            <span class="output-label">キーワード</span>
+                            <button class="copy-btn" onclick="copyToClipboard('outputKeywords', this)">📋 コピー</button>
+                        </div>
+                        <div class="output-content mono" id="outputKeywords">ここに生成されたキーワードが表示されます</div>
+                    </div>
+
+                    <!-- その他情報 -->
+                    <div class="output-card">
+                        <div class="output-header">
+                            <span class="output-label">その他情報</span>
+                            <button class="copy-btn" onclick="copyToClipboard('outputOther', this)">📋 コピー</button>
+                        </div>
+                        <div class="output-content mono" id="outputOther">JAN・原産国等の情報</div>
+                    </div>
+
+                    <!-- ルールチェック -->
+                    <div class="output-card">
+                        <div class="output-header">
+                            <span class="output-label">⚡ ルールチェック</span>
+                        </div>
+                        <div class="rule-check" id="ruleCheck">
+                            <!-- ルールチェック項目がここに動的に生成されます -->
+                        </div>
+                    </div>
+
+                    <button class="btn-primary" onclick="copyAll()">📦 全てコピー</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // グローバル状態
+        let currentCondition = 'good';
+        let currentOrigin = '';
+
+        // 用語変換マッピング（「公仔」を除外）
+        const termMapping = {
+            'フィギュア': '',
+            'ふぃぎゅあ': '',
+            'figure': '',
+            'フィギア': '',
+            '一番くじ': '一番賞',
+            'いちばんくじ': '一番賞',
+            'プライズ': '夾娃娃機',
+            'ぷらいず': '夾娃娃機',
+            'prize': '夾娃娃機',
+            'ねんどろいど': '黏土人',
+            'ネンドロイド': '黏土人',
+            'nendoroid': '黏土人',
+            'figma': 'figma',
+            'フィグマ': 'figma',
+            'ぬいぐるみ': '絨毛玩偶',
+            'ヌイグルミ': '絨毛玩偶',
+            'plush': '絨毛玩偶',
+            'キーホルダー': '鑰匙圈',
+            'きーほるだー': '鑰匙圈',
+            'バッジ': '徽章',
+            'ばっじ': '徽章',
+            'badge': '徽章',
+            'アクリル': '壓克力',
+            'あくりる': '壓克力',
+            'acrylic': '壓克力',
+            'タペストリー': '掛布',
+            'たぺすとりー': '掛布',
+            'tapestry': '掛布',
+            'ポスター': '海報',
+            'ぽすたー': '海報',
+            'poster': '海報',
+        };
+
+        // 作品名の簡易変換
+        const seriesMapping = {
+            'ワンピース': '航海王',
+            'わんぴーす': '航海王',
+            'one piece': '航海王',
+            'ドラゴンボール': '七龍珠',
+            'どらごんぼーる': '七龍珠',
+            'dragon ball': '七龍珠',
+            'ナルト': '火影忍者',
+            'なると': '火影忍者',
+            'naruto': '火影忍者',
+            '鬼滅の刃': '鬼滅之刃',
+            'きめつのやいば': '鬼滅之刃',
+            'demon slayer': '鬼滅之刃',
+            '呪術廻戦': '咒術迴戰',
+            'じゅじゅつかいせん': '咒術迴戰',
+            'jujutsu kaisen': '咒術迴戰',
+            '僕のヒーローアカデミア': '我的英雄學院',
+            'ぼくのひーろーあかでみあ': '我的英雄學院',
+            'my hero academia': '我的英雄學院',
+            'ヒロアカ': '我的英雄學院',
+            '進撃の巨人': '進擊的巨人',
+            'しんげきのきょじん': '進擊的巨人',
+            'attack on titan': '進擊的巨人',
+        };
+
+        // 状態ボタンのクリックハンドラー
+        document.querySelectorAll('[data-condition]').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('[data-condition]').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                currentCondition = this.dataset.condition;
+            });
+        });
+
+        // 原産国ボタンのクリックハンドラー
+        document.querySelectorAll('[data-origin]').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('[data-origin]').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                currentOrigin = this.dataset.origin;
+            });
+        });
+
+        // 折りたたみトグル
+        function toggleCollapsible() {
+            const content = document.getElementById('collapsibleContent');
+            const icon = document.getElementById('collapsibleIcon');
+            content.classList.toggle('active');
+            icon.classList.toggle('active');
+        }
+
+        // 簡易的な翻訳関数
+        function translateToTraditionalChinese(text) {
+            let result = text.toLowerCase();
+            
+            // 用語変換
+            for (const [jp, zh] of Object.entries(termMapping)) {
+                result = result.replace(new RegExp(jp, 'gi'), zh);
+            }
+            
+            // 作品名変換
+            for (const [jp, zh] of Object.entries(seriesMapping)) {
+                result = result.replace(new RegExp(jp, 'gi'), zh);
+            }
+            
+            // 連続スペースを単一スペースに
+            result = result.replace(/\s+/g, ' ').trim();
+            
+            return result;
+        }
+
+        // キーワード抽出（修正版：公仔削除、日本・動漫追加）
+        function extractKeywords(productName, brand) {
+            const keywords = new Set();
+            
+            // 商品名から主要キーワードを抽出
+            const words = productName.split(/[\s　]+/);
+            words.forEach(word => {
+                if (word.length > 1) {
+                    const translated = translateToTraditionalChinese(word);
+                    if (translated && translated.trim() !== '') {
+                        keywords.add(translated);
+                    }
+                }
+            });
+            
+            // 基本キーワード（修正版）
+            keywords.add('日本');
+            keywords.add('動漫');
+            keywords.add('日本直送');
+            keywords.add('二手');
+            keywords.add('現貨');
+            
+            if (brand) {
+                keywords.add(brand);
+            }
+            
+            return Array.from(keywords).slice(0, 10);
+        }
+
+        // タイトル生成（完全置き換え版）
+        function generateTitle(productName, officialName, condition, isSet, hasBox) {
+            const base = translateToTraditionalChinese(officialName || productName);
+
+            let parts = [];
+
+            // ①ベース（作品＋キャラ）
+            parts.push(base);
+
+            // ②セット（最優先）
+            if (isSet) {
+                parts.push('2體套組');
+            }
+
+            // ③箱（余裕あれば）
+            if (hasBox) {
+                parts.push('附盒');
+            }
+
+            // 結合して60文字制御
+            let title = '';
+            for (let part of parts) {
+                if ((title + ' ' + part).trim().length <= 60) {
+                    title = (title + ' ' + part).trim();
+                }
+            }
+
+            // 最終カット
+            if (title.length > 60) {
+                title = title.substring(0, 60);
+            }
+
+            return title;
+        }
+
+        // 説明文生成（原産国逃げ道追加版）
+        function generateDescription(productName, officialName, condition, isSet, hasBox, janCode, origin, brand) {
+            let description = '';
+            
+            // ① 商品情報
+            description += '【商品資訊】\n';
+            description += `● 商品名稱：${translateToTraditionalChinese(officialName || productName)}\n`;
+            
+            // 状態情報（必ず記載）
+            if (condition === 'new') {
+                description += '● 商品狀態：全新未開封\n';
+            } else if (condition === 'good') {
+                description += '● 商品狀態：二手，狀態良好，無明顯損傷\n';
+            } else if (condition === 'fair') {
+                description += '● 商品狀態：二手，略有使用痕跡\n';
+            }
+            
+            if (isSet) {
+                description += '● 內容：2體套組\n';
+            }
+            
+            if (hasBox) {
+                description += '● 包裝：附原裝盒\n';
+            } else {
+                description += '● 包裝：無盒（裸裝）\n';
+            }
+            
+            // JANコード（景品等の場合は明記）
+            if (janCode && janCode.trim() !== '') {
+                description += `● JAN碼：${janCode}\n`;
+            } else {
+                description += '● JAN碼：Non-JAN Item（景品或非正規商品）\n';
+            }
+            
+            // 原産国（逃げ道追加）
+            if (origin) {
+                description += `● 原產地：${origin}\n`;
+            } else {
+                description += '● 原產地：請確認商品標示\n';
+            }
+            
+            if (brand) {
+                description += `● 品牌：${brand}\n`;
+            }
+            
+            // ② 出貨說明（発送地を限定しない）
+            description += '\n【出貨說明】\n';
+            description += '● 商品由日本寄出\n';
+            description += '● 下單後約3～5天內出貨\n';
+            description += '● 訂單確認後會依序安排出貨\n';
+            description += '● 多件訂單將優先處理並可能提前出貨\n';
+            description += '● 會妥善包裝後寄出\n';
+            
+            // ③ EZ WAY実名認証の義務化
+            description += '\n【重要提醒 - EZ WAY實名認證】\n';
+            description += '● 依台灣海關規定，所有國際包裹需透過EZ WAY完成實名認證\n';
+            description += '● 未完成認證將導致包裹無法配送或延遲\n';
+            description += '● 因未完成EZ WAY認證造成的配送問題，賣家恕不負責\n';
+            description += '● 請務必在下單前確認已完成EZ WAY註冊\n';
+            
+            // ④ 注意事項（完美主義者請繞道を含む）
+            description += '\n【注意事項】\n';
+            description += '● 完美主義者請繞道\n';
+            description += '● 請以照片為準，照片即為實際商品狀態\n';
+            description += '● 微小瑕疵、輕微色差等不接受退換貨\n';
+            
+            if (condition !== 'new') {
+                description += '● 中古商品可能有些許使用痕跡\n';
+            }
+            
+            if (condition === 'fair') {
+                description += '● 本商品有明顯使用痕跡，購買前請仔細確認照片\n';
+            }
+            
+            description += '● 商品為現貨，售完不補\n';
+            description += '● 如有疑問歡迎詢問\n';
+            
+            // 英語商品名
+            const englishName = officialName || productName;
+            if (englishName) {
+                description += `\n【English】\n${englishName}\n`;
+            }
+            
+            return description;
+        }
+
+        // ルールチェック（60文字制限）
+        function checkRules(title, description, janCode) {
+            const rules = [];
+            
+            // タイトル60文字以内
+            rules.push({
+                name: 'タイトル60文字以内',
+                status: title.length <= 60 ? 'ok' : 'ng'
+            });
+            
+            // 重量・サイズなし
+            const hasWeightSize = /\d+g|\d+kg|\d+cm|\d+mm/i.test(title);
+            rules.push({
+                name: '重量・サイズ記載なし',
+                status: !hasWeightSize ? 'ok' : 'ng'
+            });
+            
+            // 「請以照片為準」含まれているか
+            rules.push({
+                name: '免責事項あり',
+                status: description.includes('請以照片為準') ? 'ok' : 'ng'
+            });
+            
+            // 状態記載あり（説明文に必須）
+            const hasCondition = description.includes('商品狀態');
+            rules.push({
+                name: '状態記載あり（説明文）',
+                status: hasCondition ? 'ok' : 'ng'
+            });
+            
+            // EZ WAY記載あり
+            const hasEZWAY = description.includes('EZ WAY');
+            rules.push({
+                name: 'EZ WAY認証記載あり',
+                status: hasEZWAY ? 'ok' : 'ng'
+            });
+            
+            // 完美主義者請繞道記載あり
+            const hasPerfectionist = description.includes('完美主義者請繞道');
+            rules.push({
+                name: '完美主義者請繞道記載',
+                status: hasPerfectionist ? 'ok' : 'ng'
+            });
+            
+            // JAN形式チェック（警告）
+            if (janCode && janCode.trim() !== '') {
+                const isValidJan = /^\d{8,13}$/.test(janCode);
+                rules.push({
+                    name: 'JAN形式',
+                    status: isValidJan ? 'ok' : 'warn'
+                });
+            }
+            
+            return rules;
+        }
+
+        // メイン生成関数（セット強制チェック追加）
+        function generateListing() {
+            const productName = document.getElementById('productName').value.trim();
+            if (!productName) {
+                showToast('商品名を入力してください', 'error');
+                return;
+            }
+            
+            const officialName = document.getElementById('officialName').value.trim();
+            const isSet = document.getElementById('isSet').checked;
+            const hasBox = document.getElementById('hasBox').checked;
+            const janCode = document.getElementById('janCode').value.trim();
+            const brand = document.getElementById('brand').value.trim();
+            
+            // 生成
+            const title = generateTitle(productName, officialName, currentCondition, isSet, hasBox);
+            const description = generateDescription(productName, officialName, currentCondition, isSet, hasBox, janCode, currentOrigin, brand);
+            const keywords = extractKeywords(productName, brand);
+            
+            // 出力
+            document.getElementById('outputTitle').textContent = title;
+            document.getElementById('outputDescription').textContent = description;
+            document.getElementById('outputKeywords').textContent = keywords.join(', ');
+            
+            // その他情報
+            let otherInfo = '';
+            if (janCode && janCode.trim() !== '') {
+                otherInfo += `JAN: ${janCode}\n`;
+            } else {
+                otherInfo += 'JAN: Non-JAN Item（景品または非正規商品）\n';
+            }
+            if (currentOrigin) otherInfo += `原産国: ${currentOrigin}\n`;
+            if (brand) otherInfo += `ブランド: ${brand}`;
+            document.getElementById('outputOther').textContent = otherInfo || '追加情報なし';
+            
+            // ルールチェック
+            const rules = checkRules(title, description, janCode);
+            const ruleCheckHtml = rules.map(rule => `
+                <div class="rule-item">
+                    <div class="rule-icon ${rule.status}">
+                        ${rule.status === 'ok' ? '✓' : rule.status === 'warn' ? '!' : '✗'}
+                    </div>
+                    <div class="rule-text">${rule.name}</div>
+                </div>
+            `).join('');
+            document.getElementById('ruleCheck').innerHTML = ruleCheckHtml;
+            
+            // セットチェック（重要）
+            if (isSet && !title.includes('套組')) {
+                showToast('⚠ セット商品なのにタイトルに未反映', 'error');
+            }
+            
+            showToast('生成完了！');
+        }
+
+        // コピー機能
+        function copyToClipboard(elementId, button) {
+            const element = document.getElementById(elementId);
+            const text = element.textContent;
+            
+            navigator.clipboard.writeText(text).then(() => {
+                const originalText = button.textContent;
+                button.textContent = '✓ コピー済み';
+                button.classList.add('copied');
+                
+                setTimeout(() => {
+                    button.textContent = originalText;
+                    button.classList.remove('copied');
+                }, 2000);
+            });
+        }
+
+        // 全コピー
+        function copyAll() {
+            const title = document.getElementById('outputTitle').textContent;
+            const description = document.getElementById('outputDescription').textContent;
+            const keywords = document.getElementById('outputKeywords').textContent;
+            const other = document.getElementById('outputOther').textContent;
+            
+            const allText = `【タイトル】\n${title}\n\n【説明文】\n${description}\n\n【キーワード】\n${keywords}\n\n【その他】\n${other}`;
+            
+            navigator.clipboard.writeText(allText).then(() => {
+                showToast('全てコピーしました！');
+            });
+        }
+
+        // フォームリセット
+        function resetForm() {
+            document.getElementById('productName').value = '';
+            document.getElementById('officialName').value = '';
+            document.getElementById('isSet').checked = false;
+            document.getElementById('hasBox').checked = false;
+            document.getElementById('janCode').value = '';
+            document.getElementById('brand').value = '';
+            
+            document.querySelectorAll('[data-condition]').forEach(b => b.classList.remove('active'));
+            document.querySelector('[data-condition="good"]').classList.add('active');
+            currentCondition = 'good';
+            
+            document.querySelectorAll('[data-origin]').forEach(b => b.classList.remove('active'));
+            document.querySelector('[data-origin=""]').classList.add('active');
+            currentOrigin = '';
+            
+            document.getElementById('outputTitle').textContent = 'ここに生成されたタイトルが表示されます';
+            document.getElementById('outputDescription').textContent = 'ここに生成された説明文が表示されます';
+            document.getElementById('outputKeywords').textContent = 'ここに生成されたキーワードが表示されます';
+            document.getElementById('outputOther').textContent = 'JAN・原産国等の情報';
+            document.getElementById('ruleCheck').innerHTML = '';
+            
+            showToast('リセットしました');
+        }
+
+        // トースト通知
+        function showToast(message, type = 'success') {
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.textContent = message;
+            if (type === 'error') {
+                toast.style.background = 'var(--accent-error)';
+            }
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.remove();
+            }, 3000);
+        }
+
+        // Enterキーで生成
+        document.getElementById('productName').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                generateListing();
+            }
+        });
+    </script>
+</body>
+</html>
