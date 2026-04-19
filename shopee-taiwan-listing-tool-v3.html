@@ -1,0 +1,1813 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shopee台湾 出品補助ツール v3</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0a0e14;
+            --bg-secondary: #151a23;
+            --bg-tertiary: #1f2937;
+            --bg-hover: #2a3441;
+            --text-primary: #e5e7eb;
+            --text-secondary: #9ca3af;
+            --text-muted: #6b7280;
+            --accent-primary: #10b981;
+            --accent-secondary: #3b82f6;
+            --accent-warning: #f59e0b;
+            --accent-error: #ef4444;
+            --border-color: #374151;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Noto Sans TC', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #0a0e14 0%, #151a23 100%);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1800px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+            animation: fadeInDown 0.6s ease-out;
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+        }
+
+        .header p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: 480px 1fr;
+            gap: 2rem;
+            animation: fadeIn 0.8s ease-out 0.2s backwards;
+        }
+
+        .section {
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            padding: 1.75rem;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid var(--border-color);
+        }
+
+        .section-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .section-title::before {
+            content: '';
+            width: 4px;
+            height: 1.1rem;
+            background: var(--accent-primary);
+            border-radius: 2px;
+        }
+
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .form-label .required {
+            color: var(--accent-error);
+            margin-left: 0.25rem;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 0.95rem;
+            transition: all 0.2s ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+        }
+
+        .form-input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .button-group {
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+        }
+
+        .btn-toggle {
+            flex: 1;
+            min-width: 100px;
+            padding: 0.65rem 1rem;
+            background: var(--bg-tertiary);
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+
+        .btn-toggle:hover {
+            background: var(--bg-hover);
+            border-color: var(--text-muted);
+        }
+
+        .btn-toggle.active {
+            background: var(--accent-primary);
+            border-color: var(--accent-primary);
+            color: white;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+        }
+
+        .toggle-switch {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem;
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .toggle-switch:hover {
+            background: var(--bg-hover);
+        }
+
+        .toggle-switch input {
+            display: none;
+        }
+
+        .toggle-slider {
+            position: relative;
+            width: 48px;
+            height: 26px;
+            background: var(--border-color);
+            border-radius: 13px;
+            transition: all 0.3s ease;
+        }
+
+        .toggle-slider::after {
+            content: '';
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+
+        .toggle-switch input:checked + .toggle-slider {
+            background: var(--accent-primary);
+        }
+
+        .toggle-switch input:checked + .toggle-slider::after {
+            transform: translateX(22px);
+        }
+
+        .toggle-label {
+            flex: 1;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .collapsible-section {
+            margin-top: 1.5rem;
+            border-top: 1px solid var(--border-color);
+            padding-top: 1.5rem;
+        }
+
+        .collapsible-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 6px;
+            transition: background 0.2s ease;
+        }
+
+        .collapsible-header:hover {
+            background: var(--bg-tertiary);
+        }
+
+        .collapsible-title {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            font-weight: 500;
+        }
+
+        .collapsible-icon {
+            color: var(--text-muted);
+            transition: transform 0.3s ease;
+        }
+
+        .collapsible-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease, padding 0.3s ease;
+        }
+
+        .collapsible-content.active {
+            max-height: 500px;
+            padding-top: 1rem;
+        }
+
+        .collapsible-icon.active {
+            transform: rotate(180deg);
+        }
+
+        .output-section {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .output-card {
+            background: var(--bg-tertiary);
+            border-radius: 10px;
+            padding: 1.25rem;
+            border: 1px solid var(--border-color);
+            position: relative;
+        }
+
+        .output-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 0.75rem;
+        }
+
+        .output-label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .copy-btn {
+            padding: 0.4rem 0.85rem;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .copy-btn:hover {
+            background: var(--accent-secondary);
+            border-color: var(--accent-secondary);
+            color: white;
+            transform: translateY(-1px);
+        }
+
+        .copy-btn:active {
+            transform: translateY(0);
+        }
+
+        .copy-btn.copied {
+            background: var(--accent-primary);
+            border-color: var(--accent-primary);
+            color: white;
+        }
+
+        .output-content {
+            font-family: 'Noto Sans TC', sans-serif;
+            color: var(--text-primary);
+            font-size: 0.95rem;
+            line-height: 1.6;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+
+        .output-content.mono {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+        }
+
+        .rule-check {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 0.75rem;
+        }
+
+        .rule-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.6rem;
+            background: var(--bg-secondary);
+            border-radius: 6px;
+            font-size: 0.85rem;
+        }
+
+        .rule-icon {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+
+        .rule-icon.ok {
+            background: var(--accent-primary);
+            color: white;
+        }
+
+        .rule-icon.ng {
+            background: var(--accent-error);
+            color: white;
+        }
+
+        .rule-icon.warn {
+            background: var(--accent-warning);
+            color: white;
+        }
+
+        .rule-text {
+            color: var(--text-secondary);
+        }
+
+        .action-bar {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .btn-primary {
+            flex: 1;
+            padding: 1rem;
+            background: linear-gradient(135deg, var(--accent-primary) 0%, #059669 100%);
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+
+        .btn-secondary {
+            padding: 1rem 1.5rem;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            color: var(--text-primary);
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-secondary:hover {
+            background: var(--bg-hover);
+            border-color: var(--text-muted);
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .toast {
+            position: fixed;
+            top: 2rem;
+            right: 2rem;
+            background: var(--accent-primary);
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            box-shadow: var(--shadow-lg);
+            font-weight: 500;
+            z-index: 1000;
+            animation: slideInRight 0.3s ease-out;
+        }
+
+        @keyframes slideInRight {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @media (max-width: 1200px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* ===== v3追加スタイル ===== */
+        .nav-tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 0;
+        }
+        .nav-tab {
+            padding: 0.65rem 1.25rem;
+            background: none;
+            border: none;
+            border-bottom: 2px solid transparent;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-bottom: -1px;
+        }
+        .nav-tab:hover { color: var(--text-secondary); }
+        .nav-tab.active {
+            color: var(--accent-primary);
+            border-bottom-color: var(--accent-primary);
+        }
+        .tab-panel { display: none; }
+        .tab-panel.active { display: block; }
+
+        .ai-mode-bar {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1rem;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            margin-bottom: 1.25rem;
+        }
+        .ai-badge {
+            padding: 0.2rem 0.6rem;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: white;
+        }
+        .ai-mode-label { color: var(--text-secondary); font-size: 0.88rem; flex: 1; }
+
+        .output-card.new-en { border-left: 3px solid var(--accent-secondary); }
+
+        .spinner {
+            display: inline-block;
+            width: 14px; height: 14px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+            vertical-align: middle;
+            margin-right: 6px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .drop-zone {
+            border: 1.5px dashed var(--border-color);
+            border-radius: 8px;
+            padding: 1.5rem;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.88rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .drop-zone:hover, .drop-zone.over {
+            border-color: var(--accent-primary);
+            background: rgba(16,185,129,0.05);
+            color: var(--text-secondary);
+        }
+
+        .attr-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.75rem;
+            margin-top: 1rem;
+        }
+        .attr-item {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 0.85rem 1rem;
+        }
+        .attr-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            margin-bottom: 0.4rem;
+        }
+        .attr-value {
+            font-size: 0.9rem;
+            color: var(--text-primary);
+            white-space: pre-wrap;
+            word-break: break-word;
+            line-height: 1.5;
+        }
+        .attr-item.full { grid-column: 1 / -1; }
+        .attr-warn { border-left: 3px solid var(--accent-warning); }
+        .attr-ok { border-left: 3px solid var(--accent-primary); }
+
+        .csv-table-wrap { overflow-x: auto; margin-top: 1rem; }
+        .csv-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.83rem;
+        }
+        .csv-table th {
+            text-align: left;
+            padding: 0.5rem 0.75rem;
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-muted);
+            font-weight: 500;
+            white-space: nowrap;
+        }
+        .csv-table td {
+            padding: 0.5rem 0.75rem;
+            border-bottom: 1px solid rgba(55,65,81,0.5);
+            color: var(--text-secondary);
+            max-width: 180px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .csv-count {
+            font-size: 0.82rem;
+            color: var(--text-muted);
+            font-weight: 400;
+            margin-left: 0.5rem;
+        }
+
+        .prompt-block {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 1.25rem;
+            margin-bottom: 1rem;
+        }
+        .prompt-block-title {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.4rem;
+        }
+        .prompt-block-desc {
+            font-size: 0.82rem;
+            color: var(--text-muted);
+            margin-bottom: 0.85rem;
+        }
+        .prompt-body {
+            background: var(--bg-primary);
+            border-radius: 6px;
+            padding: 0.9rem;
+            font-size: 0.82rem;
+            color: var(--text-secondary);
+            line-height: 1.7;
+            white-space: pre-wrap;
+            word-break: break-word;
+            max-height: 180px;
+            overflow-y: auto;
+            font-family: 'JetBrains Mono', monospace;
+            margin-bottom: 0.75rem;
+        }
+        .use-in-gen-btn {
+            padding: 0.4rem 0.85rem;
+            background: rgba(59,130,246,0.15);
+            border: 1px solid var(--accent-secondary);
+            border-radius: 6px;
+            color: var(--accent-secondary);
+            font-size: 0.8rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-left: 0.5rem;
+        }
+        .use-in-gen-btn:hover {
+            background: var(--accent-secondary);
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🛍️ Shopee台湾 出品補助ツール v3</h1>
+            <p>規約準拠の繁体字リスティング生成 | AI強化 | 属性抽出 | CSVエクスポート</p>
+        </div>
+
+        <div class="nav-tabs">
+            <button class="nav-tab active" onclick="switchMainTab('listing', this)">📝 出品生成</button>
+            <button class="nav-tab" onclick="switchMainTab('attr', this)">🔍 属性抽出</button>
+            <button class="nav-tab" onclick="switchMainTab('csv', this)">📊 CSVリスト</button>
+            <button class="nav-tab" onclick="switchMainTab('prompts', this)">📋 プロンプト集</button>
+            <button class="nav-tab" onclick="switchMainTab('dict', this)">📖 マイ辞書</button>
+        </div>
+
+        <!-- ===== TAB: 出品生成 ===== -->
+        <div id="tab-listing" class="tab-panel active">
+        <div class="main-grid">
+            <!-- 左側：入力セクション -->
+            <div class="section">
+                <div class="section-title">📝 商品情報入力</div>
+
+                <div class="ai-mode-bar">
+                    <span class="ai-badge">AI</span>
+                    <span class="ai-mode-label">AIによる高精度生成モード（繁体字・英語タイトル・原産国を自動調査）</span>
+                    <label class="toggle-switch" style="margin:0;padding:0.4rem 0.6rem">
+                        <input type="checkbox" id="aiMode" checked>
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">
+                        商品名（日本語）<span class="required">*</span>
+                    </label>
+                    <input type="text" id="productName" class="form-input" placeholder="例：ワンピース ルフィ フィギュア">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">正式商品名（任意）</label>
+                    <input type="text" id="officialName" class="form-input" placeholder="例：Portrait.Of.Pirates ワンピース ONE PIECE ルフィ">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">商品状態</label>
+                    <div class="button-group">
+                        <button class="btn-toggle" data-condition="new">新品</button>
+                        <button class="btn-toggle active" data-condition="good">状態良好</button>
+                        <button class="btn-toggle" data-condition="fair">やや傷あり</button>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="isSet">
+                        <span class="toggle-slider"></span>
+                        <span class="toggle-label">2体セット</span>
+                    </label>
+                </div>
+
+                <div class="form-group">
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="hasBox">
+                        <span class="toggle-slider"></span>
+                        <span class="toggle-label">箱あり</span>
+                    </label>
+                </div>
+
+                <!-- 折りたたみ可能セクション -->
+                <div class="collapsible-section">
+                    <div class="collapsible-header" onclick="toggleCollapsible()">
+                        <span class="collapsible-title">🔽 追加情報（任意）</span>
+                        <span class="collapsible-icon" id="collapsibleIcon">▼</span>
+                    </div>
+                    <div class="collapsible-content" id="collapsibleContent">
+                        <div class="form-group">
+                            <label class="form-label">JANコード</label>
+                            <input type="text" id="janCode" class="form-input" placeholder="4573102634252（景品の場合は空欄）">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">原産国</label>
+                            <div class="button-group">
+                                <button class="btn-toggle active" data-origin="">未選択</button>
+                                <button class="btn-toggle" data-origin="Japan">日本</button>
+                                <button class="btn-toggle" data-origin="China">中国</button>
+                                <button class="btn-toggle" data-origin="Other">その他</button>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">ブランド</label>
+                            <input type="text" id="brand" class="form-input" placeholder="例：バンダイ、メガハウス">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="action-bar">
+                    <button class="btn-primary" onclick="generateListing()">🚀 生成</button>
+                    <button class="btn-secondary" onclick="resetForm()">🔄</button>
+                </div>
+            </div>
+
+            <!-- 右側：出力セクション -->
+            <div class="section">
+                <div class="section-title">✨ 生成結果</div>
+                <div class="output-section">
+                    <!-- タイトル -->
+                    <div class="output-card">
+                        <div class="output-header">
+                            <span class="output-label">タイトル（繁體字）</span>
+                            <button class="copy-btn" onclick="copyToClipboard('outputTitle', this)">📋 コピー</button>
+                        </div>
+                        <div class="output-content" id="outputTitle">ここに生成されたタイトルが表示されます</div>
+                    </div>
+
+                    <!-- 英語タイトル（v3追加） -->
+                    <div class="output-card new-en">
+                        <div class="output-header">
+                            <span class="output-label">タイトル（英語） <span style="font-size:0.7rem;color:var(--accent-secondary);font-weight:400">AI生成時のみ</span></span>
+                            <button class="copy-btn" onclick="copyToClipboard('outputTitleEN', this)">📋 コピー</button>
+                        </div>
+                        <div class="output-content" id="outputTitleEN">AIモードONで生成すると英語タイトルが表示されます</div>
+                    </div>
+
+                    <!-- 説明文 -->
+                    <div class="output-card">
+                        <div class="output-header">
+                            <span class="output-label">說明文（繁體字）</span>
+                            <button class="copy-btn" onclick="copyToClipboard('outputDescription', this)">📋 コピー</button>
+                        </div>
+                        <div class="output-content" id="outputDescription">ここに生成された説明文が表示されます</div>
+                    </div>
+
+                    <!-- キーワード -->
+                    <div class="output-card">
+                        <div class="output-header">
+                            <span class="output-label">キーワード</span>
+                            <button class="copy-btn" onclick="copyToClipboard('outputKeywords', this)">📋 コピー</button>
+                        </div>
+                        <div class="output-content mono" id="outputKeywords">ここに生成されたキーワードが表示されます</div>
+                    </div>
+
+                    <!-- その他情報 -->
+                    <div class="output-card">
+                        <div class="output-header">
+                            <span class="output-label">その他情報</span>
+                            <button class="copy-btn" onclick="copyToClipboard('outputOther', this)">📋 コピー</button>
+                        </div>
+                        <div class="output-content mono" id="outputOther">JAN・原産国等の情報</div>
+                    </div>
+
+                    <!-- ルールチェック -->
+                    <div class="output-card">
+                        <div class="output-header">
+                            <span class="output-label">⚡ ルールチェック</span>
+                        </div>
+                        <div class="rule-check" id="ruleCheck">
+                            <!-- ルールチェック項目がここに動的に生成されます -->
+                        </div>
+                    </div>
+
+                    <button class="btn-primary" onclick="copyAll()">📦 全てコピー</button>
+                </div>
+            </div>
+        </div><!-- /.main-grid -->
+        </div><!-- /#tab-listing -->
+
+        <!-- ===== TAB: 属性抽出 ===== -->
+        <div id="tab-attr" class="tab-panel">
+        <div class="main-grid" style="grid-template-columns: 480px 1fr">
+            <div class="section">
+                <div class="section-title">🔍 商品情報から属性を抽出</div>
+                <div class="form-group">
+                    <label class="form-label">パッケージ画像（任意）</label>
+                    <div class="drop-zone" id="attrDropZone" onclick="document.getElementById('attrImgInput').click()" ondrop="handleAttrDrop(event)" ondragover="event.preventDefault();this.classList.add('over')" ondragleave="this.classList.remove('over')">
+                        <div id="attrDropText">クリックまたはドラッグで画像をアップロード<br><span style="font-size:0.78rem">JPG / PNG / WEBP</span></div>
+                        <img id="attrPreview" style="display:none;max-height:120px;max-width:100%;margin-top:10px;border-radius:6px"/>
+                    </div>
+                    <input type="file" id="attrImgInput" accept="image/*" style="display:none" onchange="handleAttrFile(this.files[0])"/>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">商品名 / ヤフオクタイトル / パッケージ文字起こし</label>
+                    <textarea id="attrText" class="form-input" rows="5" style="resize:vertical" placeholder="例：【新品】ワンピース DXF THE GRANDLINE MEN vol.5 ポートガス・D・エース バンプレスト&#10;またはパッケージ裏の全文をそのまま貼り付け"></textarea>
+                </div>
+                <div class="action-bar">
+                    <button class="btn-primary" id="attrBtn" onclick="extractAttrs()">🔍 属性を抽出</button>
+                    <button class="btn-secondary" onclick="clearAttr()">🔄</button>
+                </div>
+            </div>
+            <div class="section">
+                <div class="section-title">📊 抽出結果</div>
+                <div id="attrResultArea">
+                    <p style="color:var(--text-muted);font-size:0.9rem">左側に商品情報を入力して「属性を抽出」を押してください</p>
+                </div>
+                <div id="attrActions" style="display:none;margin-top:1.25rem">
+                    <div class="action-bar">
+                        <button class="btn-secondary" onclick="copyAttrAll()">📋 全属性コピー</button>
+                        <button class="btn-primary" onclick="useAttrInGen()">出品生成タブで使用 →</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        </div><!-- /#tab-attr -->
+
+        <!-- ===== TAB: CSVリスト ===== -->
+        <div id="tab-csv" class="tab-panel">
+        <div class="section">
+            <div class="section-title">📊 CSVリスト <span class="csv-count" id="csvCountLabel">（0件）</span></div>
+            <p style="color:var(--text-muted);font-size:0.85rem;margin-bottom:1rem">「出品生成」タブで生成後、「CSVに追加」ボタンで商品を蓄積できます</p>
+            <div class="csv-table-wrap">
+                <table class="csv-table">
+                    <thead><tr>
+                        <th>#</th><th>商品名</th><th>カテゴリー</th><th>繁体字タイトル</th><th>英語タイトル</th><th>JAN</th><th>原産国</th><th></th>
+                    </tr></thead>
+                    <tbody id="csvTableBody"></tbody>
+                </table>
+            </div>
+            <div id="csvEmpty" style="padding:2rem;text-align:center;color:var(--text-muted);font-size:0.9rem">まだリストに追加された商品はありません</div>
+            <div class="action-bar" style="margin-top:1.5rem">
+                <button class="btn-secondary" onclick="clearCsvList()">🗑 リストをクリア</button>
+                <button class="btn-primary" onclick="downloadCsv()">⬇ CSVダウンロード</button>
+            </div>
+        </div>
+        </div><!-- /#tab-csv -->
+
+        <!-- ===== TAB: プロンプト集 ===== -->
+        <div id="tab-prompts" class="tab-panel">
+        <div class="section">
+            <div class="section-title">📋 Shopee出品プロンプト集（コピペ用）</div>
+            <div class="prompt-block">
+                <p class="prompt-block-title">① 商品属性抽出プロンプト</p>
+                <p class="prompt-block-desc">商品名・パッケージ文字起こしを渡してJAN・原産国・素材などを抽出（2026年3月強化要件対応）</p>
+                <div class="prompt-body" id="prompt1">以下の商品情報を解析し、Shopeeの出品（Listing）に必要な最新の商品属性を抽出してください。
+特に2026年3月以降の厳格化された要件（JANコード、原産国、メーカー等）に基づき回答してください。
+
+【商品情報】
+[ここに商品名、ヤフオクのタイトル、またはパッケージの文字起こしを入力]
+
+【出力項目（Markdown形式）】
+1. JAN/EAN Code: 13桁のバーコード。不明な場合は候補を検索
+2. Country of Origin: 製造国。不明な場合はメーカーの一般的な製造拠点を推測し注釈
+3. Brand: 正確なメーカー名。Shopeeに登録がない場合は"No Brand"とすべきか判定
+4. Model/Series: 商品シリーズ名
+5. Material: 素材。フィギュア等はPVC/ABS等
+6. Warning: 対象年齢・小さな部品の有無など
+
+不明な部分は「不明」と記載し、確認方法（パッケージ裏を確認、メーカーHP参照等）を教えてください。</div>
+                <button class="copy-btn" onclick="cpPrompt('prompt1',this)">📋 コピー</button>
+            </div>
+            <div class="prompt-block">
+                <p class="prompt-block-title">② 翻訳・通関対策用プロンプト（英語説明文）</p>
+                <p class="prompt-block-desc">通関強化（2026年3月〜）対応の注意書き入り英語説明文を生成</p>
+                <div class="prompt-body" id="prompt2">Shopeeに出品する以下の商品の英語説明文を作成してください。
+日本からの発送であることを踏まえ、通関検査強化による配送遅延の可能性についての注意書きを必ず含めてください。
+
+【商品詳細】
+商品名：[入力]
+状態：[新品 / 中古]
+JANコード：[入力]
+原産国：[入力]
+
+【構成案】
+1. Product Overview: 商品の魅力とスペック（JANコード含む）
+2. Condition: 商品の状態（中古の場合は傷の有無など）
+3. Shipping Notice（重要）:
+   - 日本の輸出通関強化により、通常より時間を要する場合があること
+   - 追跡番号が付帯すること
+4. Customs Duties: 関税はバイヤー負担である旨の定型文
+5. Add-on Deal: おまけ・同梱物はAdd-on Deal機能をご利用くださいとの案内</div>
+                <button class="copy-btn" onclick="cpPrompt('prompt2',this)">📋 コピー</button>
+            </div>
+            <div class="prompt-block">
+                <p class="prompt-block-title">③ 実務チェックリスト（Attribute Accuracyスコア対策）</p>
+                <p class="prompt-block-desc">出品停止・検索順位低下を防ぐための確認ポイント</p>
+                <div class="prompt-body" id="prompt3">【Shopee出品 実務チェックリスト 2026年版】
+
+■ JANコードが見つからない時
+- プライズ・一番くじ等は "Does not apply" または "N/A" を入力可
+- まずGoogleレンズでパッケージバーコードを検索（SEO対策）
+- 検索でも不明な場合のみN/Aを使用
+
+■ 原産国の確認優先順位
+1. パッケージ裏の「Made in ○○」を確認
+2. なければメーカー公式サイトを確認
+3. それでも不明なら「Japan」（ブランド国）を選択 ※通関リスクあり
+
+■ Attribute Accuracy（属性精度スコア）対策
+- 必須（*）以外の任意項目も可能な限り埋める
+- Material / Warning / Model / Brand を全て入力すると上位表示に有利
+- タイトルに g / cm / ml 等の数値を含めない（通関不一致防止）
+- 商品説明末尾に必ずJANコードを記載
+
+■ 同梱物・おまけの扱い
+- 説明文に直接書かずAdd-on Deal機能を使用
+- サンクスレター等も同様に対応
+
+■ 通関対策（2026年3月強化対応）
+- 出品データと通関書類の国・JANを一致させる
+- 商品説明に配送遅延の可能性を明記する</div>
+                <button class="copy-btn" onclick="cpPrompt('prompt3',this)">📋 コピー</button>
+            </div>
+        </div>
+        </div><!-- /#tab-prompts -->
+
+        <!-- ===== TAB: マイ辞書 ===== -->
+        <div id="tab-dict" class="tab-panel">
+        <div class="section">
+            <div class="section-title">📖 マイ辞書（カスタム翻訳登録）</div>
+            <p style="color:var(--text-muted);font-size:0.85rem;margin-bottom:1.25rem">AIが知らない作品名・キャラ名を登録しておくと、次回からAI生成時に自動で使われます。ブラウザに保存されるのでリロード後も記憶します。</p>
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:0.75rem;align-items:end;margin-bottom:1.25rem">
+                <div>
+                    <label class="form-label">日本語（検索キー）</label>
+                    <input type="text" id="dictJp" class="form-input" placeholder="例：葬送のフリーレン" />
+                </div>
+                <div>
+                    <label class="form-label">繁体字訳</label>
+                    <input type="text" id="dictTw" class="form-input" placeholder="例：葬送的芙莉蓮" />
+                </div>
+                <div>
+                    <label class="form-label">英語訳（任意）</label>
+                    <input type="text" id="dictEn" class="form-input" placeholder="例：Frieren: Beyond Journey's End" />
+                </div>
+                <button class="btn-primary" onclick="addDict()" style="white-space:nowrap">＋ 登録</button>
+            </div>
+            <div class="csv-table-wrap">
+                <table class="csv-table">
+                    <thead><tr><th>日本語</th><th>繁体字</th><th>英語</th><th></th></tr></thead>
+                    <tbody id="dictTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+        </div><!-- /#tab-dict -->
+
+    <script>
+        // グローバル状態
+        let currentCondition = 'good';
+        let currentOrigin = '';
+
+        // 用語変換マッピング（「公仔」を除外）
+        const termMapping = {
+            'フィギュア': '',
+            'ふぃぎゅあ': '',
+            'figure': '',
+            'フィギア': '',
+            '一番くじ': '一番賞',
+            'いちばんくじ': '一番賞',
+            'プライズ': '夾娃娃機',
+            'ぷらいず': '夾娃娃機',
+            'prize': '夾娃娃機',
+            'ねんどろいど': '黏土人',
+            'ネンドロイド': '黏土人',
+            'nendoroid': '黏土人',
+            'figma': 'figma',
+            'フィグマ': 'figma',
+            'ぬいぐるみ': '絨毛玩偶',
+            'ヌイグルミ': '絨毛玩偶',
+            'plush': '絨毛玩偶',
+            'キーホルダー': '鑰匙圈',
+            'きーほるだー': '鑰匙圈',
+            'バッジ': '徽章',
+            'ばっじ': '徽章',
+            'badge': '徽章',
+            'アクリル': '壓克力',
+            'あくりる': '壓克力',
+            'acrylic': '壓克力',
+            'タペストリー': '掛布',
+            'たぺすとりー': '掛布',
+            'tapestry': '掛布',
+            'ポスター': '海報',
+            'ぽすたー': '海報',
+            'poster': '海報',
+        };
+
+        // 作品名の簡易変換
+        const seriesMapping = {
+            'ワンピース': '航海王',
+            'わんぴーす': '航海王',
+            'one piece': '航海王',
+            'ドラゴンボール': '七龍珠',
+            'どらごんぼーる': '七龍珠',
+            'dragon ball': '七龍珠',
+            'ナルト': '火影忍者',
+            'なると': '火影忍者',
+            'naruto': '火影忍者',
+            '鬼滅の刃': '鬼滅之刃',
+            'きめつのやいば': '鬼滅之刃',
+            'demon slayer': '鬼滅之刃',
+            '呪術廻戦': '咒術迴戰',
+            'じゅじゅつかいせん': '咒術迴戰',
+            'jujutsu kaisen': '咒術迴戰',
+            '僕のヒーローアカデミア': '我的英雄學院',
+            'ぼくのひーろーあかでみあ': '我的英雄學院',
+            'my hero academia': '我的英雄學院',
+            'ヒロアカ': '我的英雄學院',
+            '進撃の巨人': '進擊的巨人',
+            'しんげきのきょじん': '進擊的巨人',
+            'attack on titan': '進擊的巨人',
+        };
+
+        // 状態ボタンのクリックハンドラー
+        document.querySelectorAll('[data-condition]').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('[data-condition]').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                currentCondition = this.dataset.condition;
+            });
+        });
+
+        // 原産国ボタンのクリックハンドラー
+        document.querySelectorAll('[data-origin]').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('[data-origin]').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                currentOrigin = this.dataset.origin;
+            });
+        });
+
+        // 折りたたみトグル
+        function toggleCollapsible() {
+            const content = document.getElementById('collapsibleContent');
+            const icon = document.getElementById('collapsibleIcon');
+            content.classList.toggle('active');
+            icon.classList.toggle('active');
+        }
+
+        // 簡易的な翻訳関数
+        function translateToTraditionalChinese(text) {
+            let result = text.toLowerCase();
+            
+            // 用語変換
+            for (const [jp, zh] of Object.entries(termMapping)) {
+                result = result.replace(new RegExp(jp, 'gi'), zh);
+            }
+            
+            // 作品名変換
+            for (const [jp, zh] of Object.entries(seriesMapping)) {
+                result = result.replace(new RegExp(jp, 'gi'), zh);
+            }
+            
+            // 連続スペースを単一スペースに
+            result = result.replace(/\s+/g, ' ').trim();
+            
+            return result;
+        }
+
+        // キーワード抽出（修正版：公仔削除、日本・動漫追加）
+        function extractKeywords(productName, brand) {
+            const keywords = new Set();
+            
+            // 商品名から主要キーワードを抽出
+            const words = productName.split(/[\s　]+/);
+            words.forEach(word => {
+                if (word.length > 1) {
+                    const translated = translateToTraditionalChinese(word);
+                    if (translated && translated.trim() !== '') {
+                        keywords.add(translated);
+                    }
+                }
+            });
+            
+            // 基本キーワード（修正版）
+            keywords.add('日本');
+            keywords.add('動漫');
+            keywords.add('日本直送');
+            keywords.add('二手');
+            keywords.add('現貨');
+            
+            if (brand) {
+                keywords.add(brand);
+            }
+            
+            return Array.from(keywords).slice(0, 10);
+        }
+
+        // タイトル生成（完全置き換え版）
+        function generateTitle(productName, officialName, condition, isSet, hasBox) {
+            const base = translateToTraditionalChinese(officialName || productName);
+
+            let parts = [];
+
+            // ①ベース（作品＋キャラ）
+            parts.push(base);
+
+            // ②セット（最優先）
+            if (isSet) {
+                parts.push('2體套組');
+            }
+
+            // ③箱（余裕あれば）
+            if (hasBox) {
+                parts.push('附盒');
+            }
+
+            // 結合して60文字制御
+            let title = '';
+            for (let part of parts) {
+                if ((title + ' ' + part).trim().length <= 60) {
+                    title = (title + ' ' + part).trim();
+                }
+            }
+
+            // 最終カット
+            if (title.length > 60) {
+                title = title.substring(0, 60);
+            }
+
+            return title;
+        }
+
+        // 説明文生成（原産国逃げ道追加版）
+        function generateDescription(productName, officialName, condition, isSet, hasBox, janCode, origin, brand) {
+            let description = '';
+            
+            // ① 商品情報
+            description += '【商品資訊】\n';
+            description += `● 商品名稱：${translateToTraditionalChinese(officialName || productName)}\n`;
+            
+            // 状態情報（必ず記載）
+            if (condition === 'new') {
+                description += '● 商品狀態：全新未開封\n';
+            } else if (condition === 'good') {
+                description += '● 商品狀態：二手，狀態良好，無明顯損傷\n';
+            } else if (condition === 'fair') {
+                description += '● 商品狀態：二手，略有使用痕跡\n';
+            }
+            
+            if (isSet) {
+                description += '● 內容：2體套組\n';
+            }
+            
+            if (hasBox) {
+                description += '● 包裝：附原裝盒\n';
+            } else {
+                description += '● 包裝：無盒（裸裝）\n';
+            }
+            
+            // JANコード（景品等の場合は明記）
+            if (janCode && janCode.trim() !== '') {
+                description += `● JAN碼：${janCode}\n`;
+            } else {
+                description += '● JAN碼：Non-JAN Item（景品或非正規商品）\n';
+            }
+            
+            // 原産国（逃げ道追加）
+            if (origin) {
+                description += `● 原產地：${origin}\n`;
+            } else {
+                description += '● 原產地：請確認商品標示\n';
+            }
+            
+            if (brand) {
+                description += `● 品牌：${brand}\n`;
+            }
+            
+            // ② 出貨說明（発送地を限定しない）
+            description += '\n【出貨說明】\n';
+            description += '● 商品由日本寄出\n';
+            description += '● 下單後約3～5天內出貨\n';
+            description += '● 訂單確認後會依序安排出貨\n';
+            description += '● 多件訂單將優先處理並可能提前出貨\n';
+            description += '● 會妥善包裝後寄出\n';
+            
+            // ③ EZ WAY実名認証の義務化
+            description += '\n【重要提醒 - EZ WAY實名認證】\n';
+            description += '● 依台灣海關規定，所有國際包裹需透過EZ WAY完成實名認證\n';
+            description += '● 未完成認證將導致包裹無法配送或延遲\n';
+            description += '● 因未完成EZ WAY認證造成的配送問題，賣家恕不負責\n';
+            description += '● 請務必在下單前確認已完成EZ WAY註冊\n';
+            
+            // ④ 注意事項（完美主義者請繞道を含む）
+            description += '\n【注意事項】\n';
+            description += '● 完美主義者請繞道\n';
+            description += '● 請以照片為準，照片即為實際商品狀態\n';
+            description += '● 微小瑕疵、輕微色差等不接受退換貨\n';
+            
+            if (condition !== 'new') {
+                description += '● 中古商品可能有些許使用痕跡\n';
+            }
+            
+            if (condition === 'fair') {
+                description += '● 本商品有明顯使用痕跡，購買前請仔細確認照片\n';
+            }
+            
+            description += '● 商品為現貨，售完不補\n';
+            description += '● 如有疑問歡迎詢問\n';
+            
+            // 英語商品名
+            const englishName = officialName || productName;
+            if (englishName) {
+                description += `\n【English】\n${englishName}\n`;
+            }
+            
+            return description;
+        }
+
+        // ルールチェック（60文字制限）
+        function checkRules(title, description, janCode) {
+            const rules = [];
+            
+            // タイトル60文字以内
+            rules.push({
+                name: 'タイトル60文字以内',
+                status: title.length <= 60 ? 'ok' : 'ng'
+            });
+            
+            // 重量・サイズなし
+            const hasWeightSize = /\d+g|\d+kg|\d+cm|\d+mm/i.test(title);
+            rules.push({
+                name: '重量・サイズ記載なし',
+                status: !hasWeightSize ? 'ok' : 'ng'
+            });
+            
+            // 「請以照片為準」含まれているか
+            rules.push({
+                name: '免責事項あり',
+                status: description.includes('請以照片為準') ? 'ok' : 'ng'
+            });
+            
+            // 状態記載あり（説明文に必須）
+            const hasCondition = description.includes('商品狀態');
+            rules.push({
+                name: '状態記載あり（説明文）',
+                status: hasCondition ? 'ok' : 'ng'
+            });
+            
+            // EZ WAY記載あり
+            const hasEZWAY = description.includes('EZ WAY');
+            rules.push({
+                name: 'EZ WAY認証記載あり',
+                status: hasEZWAY ? 'ok' : 'ng'
+            });
+            
+            // 完美主義者請繞道記載あり
+            const hasPerfectionist = description.includes('完美主義者請繞道');
+            rules.push({
+                name: '完美主義者請繞道記載',
+                status: hasPerfectionist ? 'ok' : 'ng'
+            });
+            
+            // JAN形式チェック（警告）
+            if (janCode && janCode.trim() !== '') {
+                const isValidJan = /^\d{8,13}$/.test(janCode);
+                rules.push({
+                    name: 'JAN形式',
+                    status: isValidJan ? 'ok' : 'warn'
+                });
+            }
+            
+            return rules;
+        }
+
+        // ===== v3: タブ切替 =====
+        function switchMainTab(name, el) {
+            document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+            el.classList.add('active');
+            document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+            document.getElementById('tab-' + name).classList.add('active');
+        }
+
+        // ===== v3: マイ辞書（localStorage） =====
+        function loadDict() {
+            try { return JSON.parse(localStorage.getItem('shopee_dict') || '[]'); } catch(e) { return []; }
+        }
+        function saveDict(arr) {
+            localStorage.setItem('shopee_dict', JSON.stringify(arr));
+        }
+        function applyDict(text) {
+            let result = text;
+            loadDict().forEach(entry => {
+                if (entry.jp && entry.tw) {
+                    result = result.replace(new RegExp(entry.jp.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'), 'gi'), entry.tw);
+                }
+            });
+            return result;
+        }
+        function renderDict() {
+            const arr = loadDict();
+            const tbody = document.getElementById('dictTableBody');
+            if (!tbody) return;
+            if (arr.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:var(--text-muted);padding:1.5rem">まだ登録されていません</td></tr>';
+                return;
+            }
+            tbody.innerHTML = arr.map((e,i) => `
+                <tr>
+                    <td>${e.jp||''}</td>
+                    <td>${e.tw||''}</td>
+                    <td>${e.en||''}</td>
+                    <td><button onclick="deleteDict(${i})" style="font-size:0.8rem;padding:2px 8px;background:rgba(239,68,68,0.15);border:1px solid var(--accent-error);border-radius:4px;color:var(--accent-error);cursor:pointer">削除</button></td>
+                </tr>`).join('');
+        }
+        function addDict() {
+            const jp = document.getElementById('dictJp').value.trim();
+            const tw = document.getElementById('dictTw').value.trim();
+            const en = document.getElementById('dictEn').value.trim();
+            if (!jp || (!tw && !en)) { showToast('日本語と繁体字/英語を入力してください', 'error'); return; }
+            const arr = loadDict();
+            arr.push({jp, tw, en});
+            saveDict(arr);
+            document.getElementById('dictJp').value = '';
+            document.getElementById('dictTw').value = '';
+            document.getElementById('dictEn').value = '';
+            renderDict();
+            showToast('辞書に追加しました！');
+        }
+        function deleteDict(i) {
+            const arr = loadDict();
+            arr.splice(i, 1);
+            saveDict(arr);
+            renderDict();
+            showToast('削除しました');
+        }
+
+        // ===== v3: Claude API呼び出し =====
+        async function callClaude(prompt) {
+            const res = await fetch('https://api.anthropic.com/v1/messages', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    model: 'claude-sonnet-4-20250514',
+                    max_tokens: 1500,
+                    messages: [{ role: 'user', content: prompt }]
+                })
+            });
+            const data = await res.json();
+            const text = data.content.map(i => i.text || '').join('');
+            return JSON.parse(text.replace(/```json|```/g, '').trim());
+        }
+
+        // ===== v3: AI生成メイン =====
+        async function generateWithAI(productName, officialName, condition, isSet, hasBox, janCode, origin, brand) {
+            const dict = loadDict();
+            const dictStr = dict.length > 0
+                ? '\n【マイ辞書（優先使用）】\n' + dict.map(e => `${e.jp} → 繁体字:${e.tw||'不明'} 英語:${e.en||'不明'}`).join('\n')
+                : '';
+
+            const condMap = { new: '新品・未開封', good: '状態良好（中古）', fair: 'やや傷あり（中古）' };
+            const condTW = { new: '全新未開封', good: '二手，狀態良好，無明顯損傷', fair: '二手，略有使用痕跡' };
+
+            const prompt = `あなたはShopee台湾向け出品のプロです。以下の商品情報からShopee出品データをJSONで生成してください。
+${dictStr}
+
+【商品情報】
+商品名: ${productName}
+正式商品名: ${officialName || 'なし'}
+状態: ${condMap[condition] || condition}
+セット: ${isSet ? '2体セット' : 'いいえ'}
+箱: ${hasBox ? 'あり' : 'なし'}
+JANコード: ${janCode || 'なし'}
+原産国: ${origin || '不明'}
+ブランド: ${brand || '不明'}
+
+【Shopeeルール厳守】
+- タイトルはg/cm/ml等の数値を含めない・60文字以内
+- JANなし商品は "Does not apply" と記載（Non-JAN Itemは使わない）
+- 原産国は商品・ブランドから推定（フィギュアは多くChina製造）
+- マイ辞書がある場合は優先して使用
+
+JSONのみ返してください（コードブロック不要）:
+{
+  "title_tw": "繁体字タイトル（60文字以内・数値なし）",
+  "title_en": "英語タイトル（100文字以内・数値なし）",
+  "description_tw": "繁体字説明文（既存テンプレ構成を維持：商品資訊・出貨說明・EZ WAY・注意事項を含む）",
+  "keywords": ["キーワード繁体字1","2","3","4","5"],
+  "jan_code": "特定できたJANコード数字のみ、不明はnull",
+  "jan_display": "説明文に表示するJAN文字列",
+  "region_of_origin": "製造国",
+  "origin_note": "推定根拠"
+}`;
+
+            return await callClaude(prompt);
+        }
+
+        // ===== メイン生成関数（AI/ローカル切替） =====
+        async function generateListing() {
+            const productName = document.getElementById('productName').value.trim();
+            if (!productName) { showToast('商品名を入力してください', 'error'); return; }
+
+            const officialName = document.getElementById('officialName').value.trim();
+            const isSet = document.getElementById('isSet').checked;
+            const hasBox = document.getElementById('hasBox').checked;
+            const janCode = document.getElementById('janCode').value.trim();
+            const brand = document.getElementById('brand').value.trim();
+            const aiMode = document.getElementById('aiMode').checked;
+
+            const btn = document.querySelector('.btn-primary[onclick="generateListing()"]');
+            const origLabel = btn.innerHTML;
+
+            if (aiMode) {
+                btn.disabled = true;
+                btn.innerHTML = '<span class="spinner"></span>AI生成中...';
+                try {
+                    const d = await generateWithAI(productName, officialName, currentCondition, isSet, hasBox, janCode, currentOrigin, brand);
+
+                    setEditable('outputTitle', d.title_tw || '');
+                    setEditable('outputTitleEN', d.title_en || '');
+                    setEditable('outputDescription', d.description_tw || '');
+                    setEditable('outputKeywords', (d.keywords || []).join(', '));
+
+                    let otherInfo = '';
+                    otherInfo += `JAN: ${d.jan_display || (janCode || 'Does not apply')}\n`;
+                    otherInfo += `原産国: ${d.region_of_origin || currentOrigin || '不明'}\n`;
+                    if (d.origin_note) otherInfo += `（${d.origin_note}）\n`;
+                    if (brand) otherInfo += `ブランド: ${brand}`;
+                    setEditable('outputOther', otherInfo.trim());
+
+                    // ルールチェック
+                    const rules = checkRules(d.title_tw || '', d.description_tw || '', janCode || d.jan_code || '');
+                    renderRules(rules);
+
+                    // CSV用に保存
+                    lastGenerated = { productName, title_tw: d.title_tw, title_en: d.title_en, jan: d.jan_display || janCode || 'Does not apply', origin: d.region_of_origin || currentOrigin || '', condition: currentCondition, brand };
+
+                    showToast('AI生成完了！クリックで編集できます');
+                } catch(e) {
+                    showToast('AI生成エラー。ローカルモードで再試行します', 'error');
+                    generateLocal(productName, officialName, isSet, hasBox, janCode, brand);
+                } finally {
+                    btn.disabled = false;
+                    btn.innerHTML = origLabel;
+                }
+            } else {
+                generateLocal(productName, officialName, isSet, hasBox, janCode, brand);
+            }
+        }
+
+        // ローカル生成（既存ロジック）
+        function generateLocal(productName, officialName, isSet, hasBox, janCode, brand) {
+            const title = generateTitle(productName, officialName, currentCondition, isSet, hasBox);
+            const description = generateDescription(productName, officialName, currentCondition, isSet, hasBox, janCode, currentOrigin, brand);
+            const keywords = extractKeywords(productName, brand);
+
+            setEditable('outputTitle', title);
+            setEditable('outputTitleEN', '（ローカルモードでは英語タイトル非対応）');
+            setEditable('outputDescription', description);
+            setEditable('outputKeywords', keywords.join(', '));
+
+            let otherInfo = '';
+            otherInfo += janCode ? `JAN: ${janCode}\n` : 'JAN: Does not apply\n';
+            if (currentOrigin) otherInfo += `原産国: ${currentOrigin}\n`;
+            if (brand) otherInfo += `ブランド: ${brand}`;
+            setEditable('outputOther', otherInfo.trim() || '追加情報なし');
+
+            const rules = checkRules(title, description, janCode);
+            renderRules(rules);
+
+            lastGenerated = { productName, title_tw: title, title_en: '', jan: janCode || 'Does not apply', origin: currentOrigin || '', condition: currentCondition, brand };
+
+            showToast('生成完了！クリックで編集できます');
+        }
+
+        // ===== v3: 編集可能出力 =====
+        let lastGenerated = null;
+        function setEditable(id, text) {
+            const el = document.getElementById(id);
+            el.textContent = text;
+            el.contentEditable = 'true';
+            el.style.outline = 'none';
+            el.style.borderBottom = '1px dashed var(--accent-secondary)';
+            el.title = 'クリックして編集できます';
+        }
+
+        // ===== v3: ルールチェック描画 =====
+        function renderRules(rules) {
+            const ruleCheckHtml = rules.map(rule => `
+                <div class="rule-item">
+                    <div class="rule-icon ${rule.status}">
+                        ${rule.status === 'ok' ? '✓' : rule.status === 'warn' ? '!' : '✗'}
+                    </div>
+                    <div class="rule-text">${rule.name}</div>
+                </div>`).join('');
+            document.getElementById('ruleCheck').innerHTML = ruleCheckHtml;
+        }
+
+        // ===== v3: CSVリスト =====
+        let csvRows = [];
+        function addToCsv() {
+            if (!lastGenerated) { showToast('先に生成してください', 'error'); return; }
+            // 編集後のテキストを取得
+            const title_tw = document.getElementById('outputTitle').textContent;
+            const title_en = document.getElementById('outputTitleEN').textContent;
+            csvRows.push({ ...lastGenerated, title_tw, title_en });
+            renderCsvTable();
+            switchMainTab('csv', document.querySelectorAll('.nav-tab')[2]);
+            showToast('CSVリストに追加しました！');
+        }
+        function renderCsvTable() {
+            const tbody = document.getElementById('csvTableBody');
+            const empty = document.getElementById('csvEmpty');
+            if (!tbody) return;
+            document.getElementById('csvCountLabel').textContent = `（${csvRows.filter(Boolean).length}件）`;
+            if (csvRows.filter(Boolean).length === 0) {
+                tbody.innerHTML = '';
+                empty.style.display = 'block';
+                return;
+            }
+            empty.style.display = 'none';
+            tbody.innerHTML = csvRows.map((r, i) => r ? `
+                <tr>
+                    <td>${i+1}</td>
+                    <td title="${r.productName}">${r.productName}</td>
+                    <td>フィギュア</td>
+                    <td title="${r.title_tw}">${r.title_tw}</td>
+                    <td title="${r.title_en||''}">${r.title_en||''}</td>
+                    <td>${r.jan}</td>
+                    <td>${r.origin}</td>
+                    <td><button onclick="csvRows[${i}]=null;renderCsvTable()" style="font-size:0.78rem;padding:2px 7px;background:rgba(239,68,68,0.12);border:1px solid var(--accent-error);border-radius:4px;color:var(--accent-error);cursor:pointer">削除</button></td>
+                </tr>` : '').join('');
+        }
+        function clearCsvList() { csvRows = []; renderCsvTable(); showToast('リストをクリアしました'); }
+        function downloadCsv() {
+            const rows = csvRows.filter(Boolean);
+            if (!rows.length) { showToast('リストが空です', 'error'); return; }
+            const headers = ['商品名', '繁体字タイトル', '英語タイトル', 'JANコード', '原産国', '状態', 'ブランド'];
+            const condLabel = { new: '新品', good: '状態良好', fair: 'やや傷あり' };
+            const esc = v => '"' + (v || '').replace(/"/g, '""') + '"';
+            const lines = [headers.map(esc).join(',')];
+            rows.forEach(r => lines.push([r.productName, r.title_tw, r.title_en, r.jan, r.origin, condLabel[r.condition]||r.condition, r.brand].map(esc).join(',')));
+            const blob = new Blob(['\uFEFF' + lines.join('\n')], { type: 'text/csv;charset=utf-8' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = 'shopee_listings_' + new Date().toISOString().slice(0,10) + '.csv';
+            a.click();
+        }
+
+        // ===== v3: 属性抽出 =====
+        let attrImgB64 = null;
+        let attrResult = null;
+        function handleAttrFile(f) {
+            if (!f || !f.type.startsWith('image/')) return;
+            const r = new FileReader();
+            r.onload = e => {
+                attrImgB64 = e.target.result.split(',')[1];
+                const img = document.getElementById('attrPreview');
+                img.src = e.target.result; img.style.display = 'block';
+                document.getElementById('attrDropText').style.display = 'none';
+            };
+            r.readAsDataURL(f);
+        }
+        function handleAttrDrop(e) {
+            e.preventDefault();
+            document.getElementById('attrDropZone').classList.remove('over');
+            handleAttrFile(e.dataTransfer.files[0]);
+        }
+        async function extractAttrs() {
+            const text = document.getElementById('attrText').value.trim();
+            if (!text && !attrImgB64) { showToast('商品情報を入力するか画像をアップロードしてください', 'error'); return; }
+
+            const btn = document.getElementById('attrBtn');
+            btn.disabled = true; btn.innerHTML = '<span class="spinner"></span>抽出中...';
+
+            const content = [];
+            if (attrImgB64) content.push({ type: 'image', source: { type: 'base64', media_type: 'image/jpeg', data: attrImgB64 } });
+            content.push({ type: 'text', text: `Shopee出品専門家として以下の商品情報から属性を抽出してください。2026年3月以降の厳格化要件（JAN・原産国・素材等）に基づいてください。${attrImgB64 ? '画像も参照してください。' : ''}
+
+【商品情報】${text || '（画像参照）'}
+
+JSONのみ返してください:
+{"jan_code":null,"jan_note":"","country_of_origin":"","origin_note":"","brand":"","brand_note":"","model_series":"","material":"","warning":"","unknown_items":""}` });
+
+            try {
+                const res = await fetch('https://api.anthropic.com/v1/messages', {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ model: 'claude-sonnet-4-20250514', max_tokens: 1000, messages: [{ role: 'user', content }] })
+                });
+                const data = await res.json();
+                const raw = data.content.map(i => i.text||'').join('').replace(/```json|```/g,'').trim();
+                attrResult = JSON.parse(raw);
+                renderAttrResult(attrResult);
+            } catch(e) { showToast('抽出エラー: ' + e.message, 'error'); }
+            finally { btn.disabled = false; btn.innerHTML = '🔍 属性を抽出'; }
+        }
+        function renderAttrResult(d) {
+            const items = [
+                { label: 'JAN / EAN Code', value: (d.jan_code || '不明') + (d.jan_note ? '\n→ ' + d.jan_note : ''), cls: d.jan_code ? 'attr-ok' : 'attr-warn' },
+                { label: 'Country of Origin', value: (d.country_of_origin || '不明') + (d.origin_note ? '\n→ ' + d.origin_note : ''), cls: d.country_of_origin ? 'attr-ok' : 'attr-warn' },
+                { label: 'Brand', value: (d.brand || '不明') + (d.brand_note ? '\n→ ' + d.brand_note : ''), cls: '' },
+                { label: 'Model / Series', value: d.model_series || '不明', cls: '' },
+                { label: 'Material', value: d.material || '不明', cls: '' },
+                { label: 'Warning', value: d.warning || '特になし', cls: '' },
+                { label: '要確認項目と確認方法', value: d.unknown_items || 'なし', cls: 'full' },
+            ];
+            document.getElementById('attrResultArea').innerHTML = `<div class="attr-grid">${items.map(i => `<div class="attr-item ${i.cls}"><div class="attr-label">${i.label}</div><div class="attr-value">${i.value}</div></div>`).join('')}</div>`;
+            document.getElementById('attrActions').style.display = 'block';
+        }
+        function copyAttrAll() {
+            if (!attrResult) return;
+            const d = attrResult;
+            const text = `JAN/EAN Code: ${d.jan_code||'不明'}\nCountry of Origin: ${d.country_of_origin||'不明'}\nBrand: ${d.brand||'不明'}\nModel/Series: ${d.model_series||'不明'}\nMaterial: ${d.material||'不明'}\nWarning: ${d.warning||'特になし'}\n要確認: ${d.unknown_items||'なし'}`;
+            navigator.clipboard.writeText(text).then(() => showToast('属性をコピーしました！'));
+        }
+        function useAttrInGen() {
+            if (!attrResult) return;
+            if (attrResult.jan_code) document.getElementById('janCode').value = attrResult.jan_code;
+            if (attrResult.brand) document.getElementById('brand').value = attrResult.brand;
+            if (attrResult.country_of_origin) {
+                const origin = attrResult.country_of_origin;
+                document.querySelectorAll('[data-origin]').forEach(b => {
+                    b.classList.remove('active');
+                    if ((origin.toLowerCase().includes('japan') && b.dataset.origin === 'Japan') ||
+                        (origin.toLowerCase().includes('china') && b.dataset.origin === 'China')) {
+                        b.classList.add('active'); currentOrigin = b.dataset.origin;
+                    }
+                });
+            }
+            switchMainTab('listing', document.querySelectorAll('.nav-tab')[0]);
+            showToast('属性を出品生成タブに反映しました！');
+        }
+        function clearAttr() {
+            document.getElementById('attrText').value = '';
+            attrImgB64 = null;
+            document.getElementById('attrPreview').style.display = 'none';
+            document.getElementById('attrDropText').style.display = 'block';
+            document.getElementById('attrResultArea').innerHTML = '<p style="color:var(--text-muted);font-size:0.9rem">左側に商品情報を入力して「属性を抽出」を押してください</p>';
+            document.getElementById('attrActions').style.display = 'none';
+        }
+
+        // ===== v3: プロンプト集コピー =====
+        function cpPrompt(id, btn) {
+            const text = document.getElementById(id).textContent;
+            navigator.clipboard.writeText(text).then(() => {
+                const o = btn.textContent; btn.textContent = '✓ コピー済み'; btn.classList.add('copied');
+                setTimeout(() => { btn.textContent = o; btn.classList.remove('copied'); }, 2000);
+            });
+        }
+
+        // ===== v3: CSVに追加ボタンを全コピーの横に追加 =====
+        document.addEventListener('DOMContentLoaded', () => {
+            renderDict();
+            renderCsvTable();
+            // 折りたたみをデフォルト展開
+            const content = document.getElementById('collapsibleContent');
+            const icon = document.getElementById('collapsibleIcon');
+            if (content && !content.classList.contains('active')) {
+                content.classList.add('active');
+                if (icon) icon.classList.add('active');
+            }
+            // 全コピーボタンの横にCSV追加ボタンを差し込む
+            const copyAllBtn = document.querySelector('.btn-primary[onclick="copyAll()"]');
+            if (copyAllBtn) {
+                const csvBtn = document.createElement('button');
+                csvBtn.className = 'btn-secondary';
+                csvBtn.textContent = '📊 CSVに追加';
+                csvBtn.onclick = addToCsv;
+                copyAllBtn.parentNode.insertBefore(csvBtn, copyAllBtn.nextSibling);
+            }
+        });
+
+        // コピー機能
+        function copyToClipboard(elementId, button) {
+            const element = document.getElementById(elementId);
+            const text = element.textContent;
+            
+            navigator.clipboard.writeText(text).then(() => {
+                const originalText = button.textContent;
+                button.textContent = '✓ コピー済み';
+                button.classList.add('copied');
+                
+                setTimeout(() => {
+                    button.textContent = originalText;
+                    button.classList.remove('copied');
+                }, 2000);
+            });
+        }
+
+        // 全コピー（v3: contentEditable対応）
+        function copyAll() {
+            const title = document.getElementById('outputTitle').textContent;
+            const titleEN = document.getElementById('outputTitleEN').textContent;
+            const description = document.getElementById('outputDescription').textContent;
+            const keywords = document.getElementById('outputKeywords').textContent;
+            const other = document.getElementById('outputOther').textContent;
+            
+            const allText = `【タイトル（繁體字）】\n${title}\n\n【タイトル（英語）】\n${titleEN}\n\n【説明文】\n${description}\n\n【キーワード】\n${keywords}\n\n【その他】\n${other}`;
+            
+            navigator.clipboard.writeText(allText).then(() => {
+                showToast('全てコピーしました！');
+            });
+        }
+
+        // フォームリセット
+        function resetForm() {
+            document.getElementById('productName').value = '';
+            document.getElementById('officialName').value = '';
+            document.getElementById('isSet').checked = false;
+            document.getElementById('hasBox').checked = false;
+            document.getElementById('janCode').value = '';
+            document.getElementById('brand').value = '';
+            
+            document.querySelectorAll('[data-condition]').forEach(b => b.classList.remove('active'));
+            document.querySelector('[data-condition="good"]').classList.add('active');
+            currentCondition = 'good';
+            
+            document.querySelectorAll('[data-origin]').forEach(b => b.classList.remove('active'));
+            document.querySelector('[data-origin=""]').classList.add('active');
+            currentOrigin = '';
+            
+            document.getElementById('outputTitle').textContent = 'ここに生成されたタイトルが表示されます';
+            document.getElementById('outputDescription').textContent = 'ここに生成された説明文が表示されます';
+            document.getElementById('outputKeywords').textContent = 'ここに生成されたキーワードが表示されます';
+            document.getElementById('outputOther').textContent = 'JAN・原産国等の情報';
+            document.getElementById('ruleCheck').innerHTML = '';
+            
+            showToast('リセットしました');
+        }
+
+        // トースト通知
+        function showToast(message, type = 'success') {
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.textContent = message;
+            if (type === 'error') {
+                toast.style.background = 'var(--accent-error)';
+            }
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.remove();
+            }, 3000);
+        }
+
+        // Enterキーで生成
+        document.getElementById('productName').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                generateListing();
+            }
+        });
+    </script>
+</body>
+</html>
